@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090c0e">
+  <meta name="description" content="鹳雀楼三维数字化漫游，体验山河四境自动巡航、自由旋转与白日黄昏光影。">
+  <title>鹳雀凌云 · 鹳雀楼实景参考漫游</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #090c0e;
+      --paper: #e9e1cf;
+      --muted: #aaa99d;
+      --gold: #c8ab77;
+      --line: rgba(233, 225, 207, 0.15);
+      --serif: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--ink);
+    }
+
+    body {
+      color: var(--paper);
+      font-family: var(--serif);
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible {
+      outline: 1px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    #stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    #stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      outline: none;
+      touch-action: none;
+    }
+
+    .sidebar {
+      position: fixed;
+      z-index: 10;
+      inset: 0 auto 0 0;
+      width: 292px;
+      padding: 46px 28px 28px 30px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(
+        90deg,
+        rgba(7, 10, 12, 0.96),
+        rgba(7, 10, 12, 0.88) 82%,
+        rgba(7, 10, 12, 0)
+      );
+      pointer-events: none;
+    }
+
+    .sidebar > * { pointer-events: auto; }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.35;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+    }
+
+    .brand p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.22em;
+    }
+
+    .brand-line {
+      width: 32px;
+      height: 1px;
+      margin-top: 27px;
+      background: var(--gold);
+      opacity: 0.8;
+    }
+
+    .section-label {
+      margin: 31px 0 13px;
+      color: #8e958f;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+    }
+
+    .scene-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .scene-button {
+      position: relative;
+      width: 100%;
+      min-height: 76px;
+      padding: 15px 8px 15px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      background: transparent;
+      border-bottom: 1px solid var(--line);
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .scene-button::before {
+      content: "";
+      position: absolute;
+      top: 17px;
+      bottom: 17px;
+      left: 0;
+      width: 2px;
+      background: var(--gold);
+      transform: scaleY(0);
+      transition: transform 180ms ease;
+    }
+
+    .scene-button:hover {
+      background: rgba(233, 225, 207, 0.045);
+    }
+
+    .scene-button.active {
+      background: rgba(200, 171, 119, 0.075);
+    }
+
+    .scene-button.active::before { transform: scaleY(1); }
+
+    .scene-number {
+      padding-top: 2px;
+      color: #96998e;
+      font-size: 11px;
+      line-height: 1.8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scene-button.active .scene-number { color: var(--gold); }
+
+    .scene-title {
+      display: block;
+      font-size: 15px;
+      line-height: 1.65;
+      white-space: nowrap;
+    }
+
+    .scene-description {
+      display: block;
+      margin-top: 5px;
+      color: #939b95;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    .tour-info {
+      margin-top: 25px;
+      padding: 0 7px 0 12px;
+    }
+
+    .mode-row {
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mode {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    .mode-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #839087;
+    }
+
+    .mode.playing .mode-dot { background: var(--gold); }
+
+    #stop-tour {
+      padding: 4px 0 4px 8px;
+      background: transparent;
+      color: var(--gold);
+      font-size: 11px;
+    }
+
+    .progress-track {
+      height: 1px;
+      margin-top: 13px;
+      overflow: hidden;
+      background: var(--line);
+    }
+
+    #tour-progress {
+      width: 100%;
+      height: 100%;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left center;
+    }
+
+    .tour-tip {
+      margin: 12px 0 0;
+      color: #7f8983;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 30px;
+      color: #89918a;
+      font-size: 10px;
+      line-height: 1.9;
+      letter-spacing: 0.16em;
+    }
+
+    .time-switch {
+      position: fixed;
+      z-index: 12;
+      top: 32px;
+      right: 34px;
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      background: rgba(8, 12, 14, 0.82);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .time-label {
+      padding: 0 15px 0 11px;
+      color: #95998e;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+
+    .time-button {
+      padding: 9px 13px;
+      background: transparent;
+      color: #aeb1a6;
+      font-size: 12px;
+      transition: background 180ms ease, color 180ms ease;
+    }
+
+    .time-button.active {
+      color: var(--paper);
+      background: rgba(233, 225, 207, 0.1);
+    }
+
+    .poem-panel {
+      position: fixed;
+      z-index: 11;
+      top: 50%;
+      right: 34px;
+      width: 248px;
+      padding: 35px 26px 32px;
+      text-align: center;
+      background: rgba(8, 11, 14, 0.88);
+      border: 1px solid rgba(200, 171, 119, 0.22);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(22px, -50%);
+      transition:
+        opacity 650ms ease,
+        transform 650ms ease,
+        visibility 650ms ease;
+    }
+
+    .poem-panel.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(0, -50%);
+    }
+
+    .poem-eyebrow {
+      margin: 0 0 19px;
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 0.32em;
+    }
+
+    .poem-panel h2 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+    }
+
+    .poem-author {
+      margin: 13px 0 25px;
+      color: #9da397;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+    }
+
+    .poem-text {
+      margin: 0;
+      font-size: 21px;
+      line-height: 2.15;
+      letter-spacing: 0.13em;
+    }
+
+    .poem-rule {
+      width: 22px;
+      height: 1px;
+      margin: 25px auto 0;
+      background: var(--gold);
+      opacity: 0.65;
+    }
+
+    #close-poem {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      width: 29px;
+      height: 29px;
+      padding: 0;
+      color: #92998e;
+      background: transparent;
+      font-family: sans-serif;
+      font-size: 20px;
+      font-weight: 300;
+    }
+
+    .help {
+      position: fixed;
+      z-index: 9;
+      left: calc(50% + 100px);
+      bottom: 24px;
+      transform: translateX(-50%);
+      padding: 9px 16px;
+      color: rgba(233, 225, 207, 0.8);
+      background: rgba(7, 11, 12, 0.55);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .help span {
+      display: inline-block;
+      margin: 0 9px;
+      color: rgba(233, 225, 207, 0.35);
+    }
+
+    #loading {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      text-align: center;
+      background: #090c0e;
+      transition: opacity 650ms ease, visibility 650ms ease;
+    }
+
+    #loading.ready {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-title {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+    }
+
+    .loading-line {
+      width: 55px;
+      height: 1px;
+      margin: 27px 0 20px;
+      background: var(--gold);
+      animation: breathe 1.8s ease-in-out infinite;
+    }
+
+    #loading-message {
+      max-width: 380px;
+      margin: 0;
+      color: #9b9f92;
+      font-size: 12px;
+      line-height: 1.9;
+      letter-spacing: 0.12em;
+    }
+
+    #retry {
+      margin-top: 22px;
+      padding: 10px 21px;
+      background: transparent;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.25; transform: scaleX(0.6); }
+      50% { opacity: 1; transform: scaleX(1); }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 260px; padding: 32px 20px 24px; }
+      .brand h1 { font-size: 29px; }
+      .scene-button { gap: 10px; padding-left: 10px; }
+      .scene-title { font-size: 14px; }
+      .time-switch { top: 24px; right: 22px; }
+      .time-label { display: none; }
+      .poem-panel { right: 22px; width: 224px; padding-inline: 20px; }
+      .help { left: calc(50% + 85px); }
+    }
+
+    @media (max-width: 680px) {
+      .sidebar {
+        inset: auto 12px max(12px, env(safe-area-inset-bottom)) 12px;
+        width: auto;
+        padding: 15px 15px 12px;
+        background: rgba(7, 11, 13, 0.9);
+        border: 1px solid var(--line);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .brand h1 { font-size: 22px; letter-spacing: 0.12em; }
+      .brand p { margin: 0; font-size: 9px; letter-spacing: 0.08em; }
+
+      .brand-line,
+      .section-label,
+      .scene-description,
+      .tour-tip,
+      .sidebar-footer,
+      .help { display: none; }
+
+      .scene-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px;
+        margin-top: 13px;
+      }
+
+      .scene-button {
+        min-height: 40px;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 5px 8px 8px;
+        border-bottom: 0;
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .scene-button::before { top: 9px; bottom: 9px; }
+      .scene-number { padding: 0; font-size: 9px; }
+      .scene-title { font-size: 12px; letter-spacing: -0.02em; }
+
+      .tour-info { margin-top: 10px; padding: 0; }
+      .mode-row { min-height: 19px; }
+      .progress-track { margin-top: 8px; }
+
+      .time-switch {
+        top: max(15px, env(safe-area-inset-top));
+        right: 12px;
+        padding: 4px;
+      }
+
+      .time-button { padding: 8px 11px; font-size: 12px; }
+
+      .poem-panel {
+        top: 77px;
+        right: 12px;
+        width: 194px;
+        padding: 24px 16px 22px;
+        transform: translate(15px, 0);
+      }
+
+      .poem-panel.visible { transform: translate(0, 0); }
+      .poem-eyebrow { margin-bottom: 14px; font-size: 9px; }
+      .poem-panel h2 { font-size: 23px; }
+      .poem-author { margin: 10px 0 16px; font-size: 11px; }
+      .poem-text { font-size: 19px; line-height: 1.95; }
+      .poem-rule { margin-top: 18px; }
+    }
+
+    @media (max-height: 570px) and (min-width: 681px) {
+      .sidebar { padding-top: 22px; padding-bottom: 18px; }
+      .brand h1 { font-size: 27px; }
+      .brand p { margin-top: 7px; }
+      .brand-line { margin-top: 15px; }
+      .section-label { margin-top: 18px; }
+      .scene-button { min-height: 55px; padding-block: 9px; }
+      .scene-description { display: none; }
+      .tour-info { margin-top: 16px; }
+      .sidebar-footer { display: none; }
+      .poem-panel { padding-block: 24px; }
+      .poem-text { font-size: 19px; line-height: 1.9; }
+      .poem-author { margin-bottom: 18px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before { animation: none !important; transition-duration: 0ms !important; }
+    }
+  </style>
+
+  <!-- 页面、Three.js 与模型由同一站点提供；模型材质内嵌于 GLB。 -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/vendor/three.module.js",
+        "three/addons/": "./assets/vendor/addons/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <main id="stage" aria-label="鹳雀楼三维漫游场景"></main>
+
+  <aside class="sidebar" aria-label="漫游导航">
+    <header class="brand">
+      <h1>鹳雀凌云</h1>
+      <p>鹳雀楼数字化漫游</p>
+    </header>
+
+    <div class="brand-line"></div>
+    <p class="section-label">山河四境</p>
+
+    <nav class="scene-nav" aria-label="选择巡航场景">
+      <button type="button" class="scene-button" data-scene="0" aria-pressed="false">
+        <span class="scene-number">01</span>
+        <span>
+          <span class="scene-title">蒲津古渡，大河在望</span>
+          <span class="scene-description">高空鸟瞰 · 徐徐入境</span>
+        </span>
+      </button>
+
+      <button type="button" class="scene-button" data-scene="1" aria-pressed="false">
+        <span class="scene-number">02</span>
+        <span>
+          <span class="scene-title">鹳雀雄楼，高台凌云</span>
+          <span class="scene-description">飞临楼前 · 环楼一周</span>
+        </span>
+      </button>
+
+      <button type="button" class="scene-button" data-scene="2" aria-pressed="false">
+        <span class="scene-number">03</span>
+        <span>
+          <span class="scene-title">层檐极目，凭栏望远</span>
+          <span class="scene-description">登临高阁 · 俯瞰黄河</span>
+        </span>
+      </button>
+
+      <button type="button" class="scene-button" data-scene="3" aria-pressed="false">
+        <span class="scene-number">04</span>
+        <span>
+          <span class="scene-title">诗诵千年，白日依山尽</span>
+          <span class="scene-description">落日长河 · 一诗千年</span>
+        </span>
+      </button>
+    </nav>
+
+    <div class="tour-info">
+      <div class="mode-row">
+        <div class="mode" id="mode">
+          <span class="mode-dot"></span>
+          <span id="mode-label" aria-live="polite">自由漫游</span>
+        </div>
+        <button type="button" id="stop-tour" hidden>结束巡航</button>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="tour-progress"></div>
+      </div>
+
+      <p class="tour-tip">点击分境开启巡航，拖拽或滚轮即可接管。</p>
+    </div>
+
+    <footer class="sidebar-footer">山西 · 永济<br>黄河东岸 · 鹳雀楼</footer>
+  </aside>
+
+  <div class="time-switch" role="group" aria-label="时辰切换">
+    <span class="time-label">时辰</span>
+    <button type="button" id="day-button" class="time-button active" aria-pressed="true">
+      白日晴空
+    </button>
+    <button type="button" id="dusk-button" class="time-button" aria-pressed="false">
+      黄昏落日
+    </button>
+  </div>
+
+  <aside class="poem-panel" id="poem-panel" aria-label="王之涣《登鹳雀楼》" aria-hidden="true" inert>
+    <button type="button" id="close-poem" aria-label="收起诗文">×</button>
+    <p class="poem-eyebrow">诗诵千年</p>
+    <h2>登鹳雀楼</h2>
+    <p class="poem-author">唐 · 王之涣</p>
+    <p class="poem-text">
+      白日依山尽，<br>
+      黄河入海流。<br>
+      欲穷千里目，<br>
+      更上一层楼。
+    </p>
+    <div class="poem-rule"></div>
+  </aside>
+
+  <div class="help">
+    左键拖拽旋转<span>·</span>滚轮缩放<span>·</span>操作即可接管
+  </div>
+
+  <div id="loading" role="status">
+    <h2 class="loading-title">鹳雀凌云</h2>
+    <div class="loading-line"></div>
+    <p id="loading-message">正在构筑楼阁与山河</p>
+    <button type="button" id="retry" hidden>重新加载</button>
+  </div>
+
+  <noscript>
+    <div style="position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:#090c0e;color:#e9e1cf;">
+      请启用 JavaScript，进入鹳雀楼数字化漫游。
+    </div>
+  </noscript>
+
+  
+
+  <script type="module">
+    const loading = document.getElementById("loading");
+    const loadingMessage = document.getElementById("loading-message");
+    const retryButton = document.getElementById("retry");
+
+    retryButton.addEventListener("click", () => location.reload());
+
+    try {
+      const [THREE, { OrbitControls }, { GLTFLoader }] = await Promise.all([
+        import("three"),
+        import("three/addons/controls/OrbitControls.js"),
+        import("three/addons/loaders/GLTFLoader.js")
+      ]);
+
+      await initialize(THREE, OrbitControls, GLTFLoader);
+    } catch (error) {
+      console.error(error);
+      loading.classList.remove("ready");
+      loadingMessage.textContent =
+        "场景暂未载入。请检查网络连接，或使用支持 WebGL 2 的新版浏览器，然后重新加载。";
+      retryButton.hidden = false;
+    }
+
+    async function initialize(THREE, OrbitControls, GLTFLoader) {
+      // =========================================================
+      // 1. 基础场景与渲染：限制像素数量，静态建筑按需更新阴影。
+      // =========================================================
+      const stage = document.getElementById("stage");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0xd4d6bd, 0.00030);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false,
+        powerPreference: "high-performance"
+      });
+
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.03;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.shadowMap.autoUpdate = false;
+
+      stage.appendChild(renderer.domElement);
+      renderer.domElement.tabIndex = 0;
+      renderer.domElement.setAttribute(
+        "aria-label",
+        "鹳雀楼三维场景，拖拽旋转，滚轮缩放"
+      );
+
+      const camera = new THREE.PerspectiveCamera(44, 1, 0.35, 16000);
+      camera.position.set(166, 115, 216);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 49, 0);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.065;
+      controls.rotateSpeed = 0.52;
+      controls.zoomSpeed = 0.8;
+      controls.enablePan = false;
+      controls.minDistance = 30;
+      controls.maxDistance = 1450;
+      controls.minPolarAngle = 0.05;
+      controls.maxPolarAngle = Math.PI * 0.493;
+      controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+      controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
+      controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+      controls.touches.ONE = THREE.TOUCH.ROTATE;
+      controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+      controls.update();
+
+      const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+      const clamp = THREE.MathUtils.clamp;
+      const mix = THREE.MathUtils.lerp;
+      const smooth = t => {
+        t = clamp(t, 0, 1);
+        return t * t * t * (t * (t * 6 - 15) + 10);
+      };
+
+      const standard = (color, extra = {}) =>
+        new THREE.MeshStandardMaterial({
+          color,
+          roughness: 0.92,
+          metalness: 0,
+          ...extra
+        });
+
+      const materials = {
+        stone: standard("#c7bea4"),
+        stoneDark: standard("#9c947d"),
+        red: standard("#a14732"),
+        darkRed: standard("#642f25"),
+        timber: standard("#aa7e49"),
+        wall: standard("#753b2c"),
+        window: standard("#222b27", { roughness: 0.65 }),
+        roof: standard("#535e59", { side: THREE.DoubleSide }),
+        tile: standard("#69716a", { side: THREE.DoubleSide }),
+        ridge: standard("#414d48"),
+        soffit: standard("#544735", { side: THREE.DoubleSide }),
+        plaque: standard("#30261b"),
+        courtyard: standard("#b5b197")
+      };
+
+      const hemisphere = new THREE.HemisphereLight(0xd9e5e8, 0x887653, 1.65);
+      scene.add(hemisphere);
+
+      const sunLight = new THREE.DirectionalLight(0xffedc5, 3.0);
+      sunLight.castShadow = true;
+      sunLight.target.position.set(0, 45, 0);
+      sunLight.shadow.mapSize.set(
+        matchMedia("(pointer: coarse)").matches ? 1024 : 2048,
+        matchMedia("(pointer: coarse)").matches ? 1024 : 2048
+      );
+      Object.assign(sunLight.shadow.camera, {
+        left: -165,
+        right: 165,
+        top: 180,
+        bottom: -150,
+        near: 10,
+        far: 2100
+      });
+      sunLight.shadow.bias = -0.00025;
+      sunLight.shadow.normalBias = 0.055;
+      scene.add(sunLight, sunLight.target);
+
+      const fillLight = new THREE.DirectionalLight(0xd4e1e4, 0.6);
+      fillLight.position.set(180, 140, 240);
+      scene.add(fillLight);
+
+      // =========================================================
+      // 2. 结构构件实例化：立柱、栏杆、门窗、斗拱共享几何体。
+      // =========================================================
+      const unitBox = new THREE.BoxGeometry(1, 1, 1);
+      const unitCylinder = new THREE.CylinderGeometry(1, 1, 1, 10, 1);
+      const instanceBatches = new Map();
+      const transform = new THREE.Object3D();
+      const vertical = V(0, 1, 0);
+
+      function addInstance(geometry, material, position, scale, quaternion, cast = true) {
+        const key = geometry.uuid + material.uuid + String(cast);
+
+        if (!instanceBatches.has(key)) {
+          instanceBatches.set(key, {
+            geometry,
+            material,
+            cast,
+            matrices: []
+          });
+        }
+
+        transform.position.copy(position);
+        transform.scale.copy(scale);
+        transform.quaternion.identity();
+        if (quaternion) transform.quaternion.copy(quaternion);
+        transform.updateMatrix();
+
+        instanceBatches.get(key).matrices.push(transform.matrix.clone());
+      }
+
+      function box(w, h, d, x, y, z, material, cast = true) {
+        addInstance(unitBox, material, V(x, y, z), V(w, h, d), null, cast);
+      }
+
+      function cylinder(radius, height, x, y, z, material, cast = true) {
+        addInstance(
+          unitCylinder, material,
+          V(x, y, z), V(radius, height, radius),
+          null, cast
+        );
+      }
+
+      function beamBetween(a, b, width, depth, material, cast = true) {
+        const direction = b.clone().sub(a);
+        const length = direction.length();
+        const quaternion = new THREE.Quaternion()
+          .setFromUnitVectors(vertical, direction.normalize());
+
+        addInstance(
+          unitBox,
+          material,
+          a.clone().add(b).multiplyScalar(0.5),
+          V(width, length, depth),
+          quaternion,
+          cast
+        );
+      }
+
+      function flushInstances() {
+        for (const batch of instanceBatches.values()) {
+          const mesh = new THREE.InstancedMesh(
+            batch.geometry,
+            batch.material,
+            batch.matrices.length
+          );
+
+          batch.matrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
+          mesh.instanceMatrix.needsUpdate = true;
+          mesh.castShadow = batch.cast;
+          mesh.receiveShadow = true;
+          mesh.computeBoundingSphere();
+          scene.add(mesh);
+        }
+      }
+
+      function geometryFromArrays(positions, indices, colors) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(positions, 3)
+        );
+        geometry.setIndex(indices);
+
+        if (colors) {
+          geometry.setAttribute(
+            "color",
+            new THREE.Float32BufferAttribute(colors, 3)
+          );
+        }
+
+        geometry.computeVertexNormals();
+        geometry.computeBoundingSphere();
+        return geometry;
+      }
+
+      // =========================================================
+      // 3. 实景照片参考模型。独立加载 GLB，显示网络下载进度。
+      //    网页版合并同材质构件，完整分组保留在独立精细 GLB 中。
+      // =========================================================
+      const model = await new GLTFLoader().loadAsync(
+        "./assets/guanque-tower.glb",
+        progress => {
+          if (progress.lengthComputable && progress.total > 0) {
+            const percent = Math.min(100, Math.round(progress.loaded / progress.total * 100));
+            loadingMessage.textContent = percent < 100
+              ? `正在构筑楼阁 · ${percent}%`
+              : "正在铺展山河与光影";
+          } else {
+            const megabytes = (progress.loaded / 1024 / 1024).toFixed(1);
+            loadingMessage.textContent = `正在构筑楼阁 · 已载入 ${megabytes} MB`;
+          }
+        }
+      );
+      loadingMessage.textContent = "正在铺展山河与光影";
+      model.scene.name = "鹳雀楼 · 实景参考";
+      model.scene.scale.setScalar(1.4);
+      const anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+      model.scene.traverse(object => {
+        if (!object.isMesh) return;
+        object.castShadow = true;
+        object.receiveShadow = true;
+        for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+          if (material.map) material.map.anisotropy = anisotropy;
+          if (material.normalMap) material.normalMap.anisotropy = anisotropy;
+        }
+      });
+      scene.add(model.scene);
+      renderer.domElement.addEventListener("webglcontextlost", event => {
+        event.preventDefault();
+        renderer.setAnimationLoop(null);
+        loading.classList.remove("ready");
+        loadingMessage.textContent = "画面已暂停，请重新加载继续漫游。";
+        retryButton.hidden = false;
+      });
+
+      // =========================================================
+      // 6. 平原、黄河与远山：全部由参数化网格生成。
+      // =========================================================
+      const groundMaterial = standard("#a5aa88");
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(18000, 18000),
+        groundMaterial
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.28;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      box(206, 0.08, 198, 0, 0.01, 27, materials.courtyard, false);
+      box(20, 0.055, 240, 0, 0.012, 212, materials.courtyard, false);
+
+      const riverCenter = x =>
+        -515 + Math.sin(x * 0.00115) * 88 + Math.sin(x * 0.0029) * 30;
+
+      const riverWidth = x =>
+        410 + Math.sin(x * 0.0017 + 1.2) * 35;
+
+      const riverSegments = 180;
+      const riverRows = 14;
+      const riverLength = 14000;
+
+      function buildRiverGeometry() {
+        const positions = [];
+        const indices = [];
+
+        for (let i = 0; i <= riverSegments; i++) {
+          const x = -riverLength / 2 + riverLength * i / riverSegments;
+
+          for (let j = 0; j <= riverRows; j++) {
+            const z = riverCenter(x) + (j / riverRows - 0.5) * riverWidth(x);
+            positions.push(x, 0.025, z);
+          }
+        }
+
+        for (let i = 0; i < riverSegments; i++) {
+          for (let j = 0; j < riverRows; j++) {
+            const a = i * (riverRows + 1) + j;
+            const b = (i + 1) * (riverRows + 1) + j;
+            const c = a + 1;
+            const d = b + 1;
+            indices.push(a, c, b, b, c, d);
+          }
+        }
+
+        return geometryFromArrays(positions, indices);
+      }
+
+      const bankMaterial = standard("#b5ae87", { side: THREE.DoubleSide });
+
+      for (const sign of [-1, 1]) {
+        const positions = [];
+        const indices = [];
+
+        for (let i = 0; i <= riverSegments; i++) {
+          const x = -riverLength / 2 + riverLength * i / riverSegments;
+          const edge = riverCenter(x) + sign * riverWidth(x) / 2;
+
+          positions.push(x, 0.17, edge);
+          positions.push(x, -0.12, edge + sign * 27);
+        }
+
+        for (let i = 0; i < riverSegments; i++) {
+          const a = i * 2;
+          indices.push(a, a + 1, a + 2, a + 2, a + 1, a + 3);
+        }
+
+        const bank = new THREE.Mesh(
+          geometryFromArrays(positions, indices),
+          bankMaterial
+        );
+        bank.receiveShadow = true;
+        scene.add(bank);
+      }
+
+      const sunDirection = V(-0.35, 0.8, -0.4).normalize();
+      const sunVisualColor = new THREE.Color("#fff0c6");
+      const horizonColor = new THREE.Color("#d4d6bd");
+
+      const waterUniforms = THREE.UniformsUtils.merge([
+        THREE.UniformsLib.fog,
+        {
+          uTime: { value: 0 },
+          uDusk: { value: 0 },
+          uWaterColor: { value: new THREE.Color("#a19b6f") },
+          uHorizon: { value: new THREE.Color("#d4d6bd") },
+          uSunDirection: { value: V() },
+          uSunColor: { value: new THREE.Color() }
+        }
+      ]);
+
+      const waterMaterial = new THREE.ShaderMaterial({
+        uniforms: waterUniforms,
+        fog: true,
+        side: THREE.DoubleSide,
+        vertexShader: `
+          uniform float uTime;
+          varying vec3 vWorldPosition;
+          #include <fog_pars_vertex>
+
+          void main() {
+            vec3 p = position;
+            p.y += sin(p.x * 0.026 + p.z * 0.039 + uTime * 0.48) * 0.07;
+            p.y += sin(p.z * 0.045 - uTime * 0.32) * 0.035;
+
+            vec4 world = modelMatrix * vec4(p, 1.0);
+            vWorldPosition = world.xyz;
+            vec4 mvPosition = viewMatrix * world;
+
+            gl_Position = projectionMatrix * mvPosition;
+            #include <fog_vertex>
+          }
+        `,
+        fragmentShader: `
+          uniform float uTime;
+          uniform float uDusk;
+          uniform vec3 uWaterColor;
+          uniform vec3 uHorizon;
+          uniform vec3 uSunDirection;
+          uniform vec3 uSunColor;
+          varying vec3 vWorldPosition;
+
+          #include <common>
+          #include <fog_pars_fragment>
+
+          void main() {
+            vec2 p = vWorldPosition.xz;
+
+            float rippleA = sin(p.x * 0.12 + p.y * 0.18 + uTime * 0.63);
+            float rippleB = sin(p.x * 0.035 - p.y * 0.25 - uTime * 0.48);
+            float fine = sin(p.x * 0.62 + p.y * 0.29 + uTime * 0.8);
+
+            vec3 normal = normalize(vec3(
+              0.040 * cos(p.x * 0.12 + p.y * 0.18 + uTime * 0.63),
+              1.0,
+              0.075 * cos(p.y * 0.25 - uTime * 0.48)
+            ));
+
+            vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+            vec3 halfDirection = normalize(viewDirection + normalize(uSunDirection));
+
+            float fresnel = pow(
+              1.0 - max(dot(normal, viewDirection), 0.0),
+              3.0
+            );
+
+            float specular = pow(max(dot(normal, halfDirection), 0.0), 150.0);
+            float softReflection = pow(max(dot(normal, halfDirection), 0.0), 24.0);
+            float variation = rippleA * 0.023 + rippleB * 0.017;
+
+            vec3 color = mix(uWaterColor, uHorizon, fresnel * 0.34);
+            color *= 0.94 + variation;
+            color += uSunColor * (
+              specular * mix(1.0, 1.85, uDusk) *
+              (0.65 + fine * 0.25) +
+              softReflection * 0.055
+            );
+
+            gl_FragColor = vec4(color, 1.0);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+            #include <fog_fragment>
+          }
+        `
+      });
+
+      const river = new THREE.Mesh(buildRiverGeometry(), waterMaterial);
+      scene.add(river);
+
+      const mountains = [];
+
+      function buildMountains(index) {
+        const positions = [];
+        const indices = [];
+        const columns = 128;
+        const rows = 10;
+        const width = 13000;
+        const depth = 540 + index * 180;
+        const centerZ = -1650 - index * 560;
+
+        for (let i = 0; i <= columns; i++) {
+          const x = -width / 2 + width * i / columns;
+
+          const height =
+            98 + index * 33 +
+            35 * Math.sin(x * 0.0021 + index * 1.7) +
+            26 * Math.sin(x * 0.0045 + index * 0.7) +
+            12 * Math.cos(x * 0.0081);
+
+          for (let j = 0; j <= rows; j++) {
+            const t = j / rows;
+            const z =
+              centerZ + (t - 0.5) * depth +
+              Math.sin(x * 0.0018 + index) * 90;
+
+            const profile = Math.pow(Math.sin(Math.PI * t), 1.45);
+            positions.push(x, Math.max(0, profile * height), z);
+          }
+        }
+
+        for (let i = 0; i < columns; i++) {
+          for (let j = 0; j < rows; j++) {
+            const a = i * (rows + 1) + j;
+            const b = (i + 1) * (rows + 1) + j;
+            indices.push(a, a + 1, b, b, a + 1, b + 1);
+          }
+        }
+
+        const material = standard("#8d9f99");
+        const mesh = new THREE.Mesh(
+          geometryFromArrays(positions, indices),
+          material
+        );
+        scene.add(mesh);
+        mountains.push(mesh);
+      }
+
+      for (let i = 0; i < 3; i++) buildMountains(i);
+
+      // =========================================================
+      // 7. 程序天空与太阳：渐变天空、日轮、日晕随时辰平滑过渡。
+      // =========================================================
+      const skyUniforms = {
+        uZenith: { value: new THREE.Color("#6f9ebc") },
+        uHorizon: { value: horizonColor },
+        uSunDirection: { value: sunDirection },
+        uSunColor: { value: sunVisualColor },
+        uDusk: { value: 0 }
+      };
+
+      const skyMaterial = new THREE.ShaderMaterial({
+        uniforms: skyUniforms,
+        side: THREE.BackSide,
+        depthWrite: false,
+        depthTest: false,
+        fog: false,
+        vertexShader: `
+          varying vec3 vDirection;
+
+          void main() {
+            vDirection = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uZenith;
+          uniform vec3 uHorizon;
+          uniform vec3 uSunDirection;
+          uniform vec3 uSunColor;
+          uniform float uDusk;
+          varying vec3 vDirection;
+
+          void main() {
+            vec3 direction = normalize(vDirection);
+            vec3 sun = normalize(uSunDirection);
+
+            float elevation = pow(
+              smoothstep(-0.055, 0.82, direction.y),
+              0.72
+            );
+
+            vec3 color = mix(uHorizon, uZenith, elevation);
+            float alignment = max(dot(direction, sun), 0.0);
+
+            float radius = mix(0.012, 0.020, uDusk);
+            float disk = smoothstep(
+              cos(radius),
+              cos(radius * 0.84),
+              alignment
+            );
+
+            float halo = pow(alignment, 48.0) * mix(0.16, 0.40, uDusk);
+            float innerHalo = pow(alignment, 640.0) * 0.13;
+
+            vec3 flatView = normalize(vec3(direction.x, 0.001, direction.z));
+            vec3 flatSun = normalize(vec3(sun.x, 0.001, sun.z));
+
+            float horizonGlow =
+              pow(1.0 - clamp(abs(direction.y), 0.0, 1.0), 7.0) *
+              pow(max(dot(flatView, flatSun), 0.0), 9.0) *
+              uDusk * 0.22;
+
+            color += uSunColor * (disk * 2.25 + halo + innerHalo + horizonGlow);
+
+            gl_FragColor = vec4(color, 1.0);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
+        `
+      });
+
+      const sky = new THREE.Mesh(
+        new THREE.SphereGeometry(8500, 32, 16),
+        skyMaterial
+      );
+      sky.renderOrder = -100;
+      sky.frustumCulled = false;
+      scene.add(sky);
+
+      flushInstances();
+
+      const palettes = {
+        zenith: [new THREE.Color("#6f9ebc"), new THREE.Color("#3c455b")],
+        horizon: [new THREE.Color("#d4d6bd"), new THREE.Color("#c18f66")],
+        sun: [new THREE.Color("#fff0c6"), new THREE.Color("#ffb66d")],
+        hemiSky: [new THREE.Color("#d9e5e8"), new THREE.Color("#c4a18b")],
+        hemiGround: [new THREE.Color("#887653"), new THREE.Color("#70513e")],
+        fill: [new THREE.Color("#d4e1e4"), new THREE.Color("#b2b4c3")],
+        ground: [new THREE.Color("#a5aa88"), new THREE.Color("#7c755b")],
+        bank: [new THREE.Color("#b5ae87"), new THREE.Color("#98815e")],
+        water: [new THREE.Color("#a19b6f"), new THREE.Color("#716952")],
+        hills: [
+          [new THREE.Color("#879c95"), new THREE.Color("#787970")],
+          [new THREE.Color("#9bada6"), new THREE.Color("#8c8378")],
+          [new THREE.Color("#b0bbb0"), new THREE.Color("#a08e7b")]
+        ]
+      };
+
+      const daySunDirection = V(-0.35, 0.8, -0.4).normalize();
+      const duskSunDirection = V(-0.34, 0.105, -0.935).normalize();
+
+      let lightAmount = 0;
+      let requestedLight = 0;
+
+      function blendColor(destination, pair, amount) {
+        destination.copy(pair[0]).lerp(pair[1], amount);
+      }
+
+      function applyLighting(amount) {
+        blendColor(skyUniforms.uZenith.value, palettes.zenith, amount);
+        blendColor(horizonColor, palettes.horizon, amount);
+        blendColor(sunVisualColor, palettes.sun, amount);
+        sunDirection.lerpVectors(daySunDirection, duskSunDirection, amount).normalize();
+
+        skyUniforms.uDusk.value = amount;
+        scene.fog.color.copy(horizonColor);
+        scene.fog.density = mix(0.00030, 0.00036, amount);
+
+        blendColor(hemisphere.color, palettes.hemiSky, amount);
+        blendColor(hemisphere.groundColor, palettes.hemiGround, amount);
+        hemisphere.intensity = mix(1.65, 1.13, amount);
+
+        sunLight.color.copy(sunVisualColor);
+        sunLight.intensity = mix(3.0, 2.75, amount);
+        sunLight.position.copy(sunLight.target.position).addScaledVector(sunDirection, 720);
+
+        blendColor(fillLight.color, palettes.fill, amount);
+        fillLight.intensity = mix(0.6, 0.45, amount);
+
+        blendColor(groundMaterial.color, palettes.ground, amount);
+        blendColor(bankMaterial.color, palettes.bank, amount);
+
+        mountains.forEach((mountain, index) => {
+          blendColor(mountain.material.color, palettes.hills[index], amount);
+        });
+
+        blendColor(waterUniforms.uWaterColor.value, palettes.water, amount);
+        waterUniforms.uHorizon.value.copy(horizonColor);
+        waterUniforms.uSunDirection.value.copy(sunDirection);
+        waterUniforms.uSunColor.value.copy(sunVisualColor);
+        waterUniforms.uDusk.value = amount;
+
+        renderer.toneMappingExposure = mix(1.03, 0.92, amount);
+        renderer.shadowMap.needsUpdate = true;
+      }
+
+      const dayButton = document.getElementById("day-button");
+      const duskButton = document.getElementById("dusk-button");
+
+      function setTime(dusk) {
+        requestedLight = dusk ? 1 : 0;
+        dayButton.classList.toggle("active", !dusk);
+        duskButton.classList.toggle("active", Boolean(dusk));
+        dayButton.setAttribute("aria-pressed", String(!dusk));
+        duskButton.setAttribute("aria-pressed", String(Boolean(dusk)));
+      }
+
+      dayButton.addEventListener("click", () => setTime(false));
+      duskButton.addEventListener("click", () => setTime(true));
+      applyLighting(0);
+
+      // =========================================================
+      // 8. 四段巡航：平滑接入、完整环绕、登临平台与落日诗境。
+      //    相机位置与视线目标分别插值；巡航中不运行 OrbitControls。
+      // =========================================================
+      const sceneButtons = [...document.querySelectorAll(".scene-button")];
+      const modeElement = document.getElementById("mode");
+      const modeLabel = document.getElementById("mode-label");
+      const stopButton = document.getElementById("stop-tour");
+      const progressElement = document.getElementById("tour-progress");
+      const poemPanel = document.getElementById("poem-panel");
+
+      function showPoem(visible) {
+        poemPanel.classList.toggle("visible", visible);
+        poemPanel.setAttribute("aria-hidden", String(!visible));
+        poemPanel.inert = !visible;
+      }
+
+      document.getElementById("close-poem").addEventListener("click", () => {
+        showPoem(false);
+      });
+
+      // 路径先从屋檐外侧抬升，再从东北方向进入第三层观景平台，
+      // 避免直接穿越楼身及四道屋面。
+      const platformPath = new THREE.CatmullRomCurve3([
+        V(100, 125, 100),
+        V(76, 116, 40),
+        V(48, 109, -32),
+        V(36, 90, -32),
+        V(31, 83.2, -25),
+        V(26, 81.4, -17.8)
+      ], false, "centripetal");
+
+      const routes = [
+        { approach: 4.0, duration: 17.0 },
+        { approach: 4.3, duration: 32.0 },
+        { approach: 4.5, duration: 17.0 },
+        { approach: 4.0, duration: 20.0 }
+      ];
+
+      const routePoints = {
+        overviewStart: V(410, 274, 580),
+        overviewEnd: V(235, 156, 335),
+        overviewLookStart: V(-125, 26, -265),
+        overviewLookEnd: V(-15, 45, -75),
+        platformLookStart: V(0, 76, 0),
+        platformLookEnd: V(-140, 32, -650),
+        duskStart: V(200, 123, 310),
+        duskEnd: V(155, 97, 255),
+        duskLookStart: V(20, 62, -90),
+        duskLookEnd: V(16, 56, -130)
+      };
+
+      function sampleRoute(index, progress, position, target) {
+        const t = smooth(progress);
+
+        if (index === 0) {
+          position.lerpVectors(routePoints.overviewStart, routePoints.overviewEnd, t);
+          target.lerpVectors(routePoints.overviewLookStart, routePoints.overviewLookEnd, t);
+        } else if (index === 1) {
+          // 从正前方开始，恰好完成 360° 环绕。
+          const angle = Math.PI * 2 * t;
+          position.set(
+            Math.sin(angle) * 184,
+            82 + Math.sin(Math.PI * t) * 9,
+            Math.cos(angle) * 184
+          );
+          target.set(0, 50, 0);
+        } else if (index === 2) {
+          platformPath.getPointAt(t, position);
+          target.lerpVectors(
+            routePoints.platformLookStart,
+            routePoints.platformLookEnd,
+            smooth(Math.min(1, t * 1.14))
+          );
+        } else {
+          position.lerpVectors(routePoints.duskStart, routePoints.duskEnd, t);
+          target.lerpVectors(routePoints.duskLookStart, routePoints.duskLookEnd, t);
+        }
+      }
+
+      // 若接入航线穿过主楼附近，增加上拱高度，从屋脊上方飞越。
+      function approachLift(from, to) {
+        const dx = to.x - from.x;
+        const dz = to.z - from.z;
+        const lengthSquared = dx * dx + dz * dz;
+
+        const nearest = lengthSquared > 0.001
+          ? clamp(-(from.x * dx + from.z * dz) / lengthSquared, 0, 1)
+          : 0;
+
+        const x = from.x + dx * nearest;
+        const z = from.z + dz * nearest;
+
+        if (x * x + z * z < 88 * 88) {
+          return Math.max(22, 144 - Math.min(from.y, to.y));
+        }
+
+        return 12;
+      }
+
+      let tour = null;
+      const sampledPosition = V();
+      const sampledTarget = V();
+
+      function clearControlMomentum() {
+        controls.enableDamping = false;
+        controls.update();
+        controls.enableDamping = true;
+      }
+
+      function stopTour(completed = false) {
+        if (!tour) return;
+
+        tour = null;
+        controls.enabled = true;
+        clearControlMomentum();
+
+        modeElement.classList.remove("playing");
+        modeLabel.textContent = "自由漫游";
+        stopButton.hidden = true;
+        progressElement.style.transform = completed ? "scaleX(1)" : "scaleX(0)";
+      }
+
+      function startTour(index) {
+        if (tour) stopTour();
+        clearControlMomentum();
+
+        const entryPosition = V();
+        const entryTarget = V();
+        sampleRoute(index, 0, entryPosition, entryTarget);
+
+        tour = {
+          index,
+          elapsed: 0,
+          approach: routes[index].approach,
+          duration: routes[index].duration,
+          fromPosition: camera.position.clone(),
+          fromTarget: controls.target.clone(),
+          entryPosition,
+          entryTarget,
+          lift: approachLift(camera.position, entryPosition)
+        };
+
+        controls.enabled = false;
+
+        sceneButtons.forEach((button, buttonIndex) => {
+          const active = index === buttonIndex;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+
+        modeElement.classList.add("playing");
+        modeLabel.textContent = `巡航中 · 第${["一", "二", "三", "四"][index]}境`;
+        stopButton.hidden = false;
+        progressElement.style.transform = "scaleX(0)";
+
+        showPoem(index === 3);
+        if (index === 3) setTime(true);
+      }
+
+      sceneButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          startTour(Number(button.dataset.scene));
+        });
+      });
+
+      stopButton.addEventListener("click", () => stopTour());
+
+      // 使用捕获阶段监听：在 OrbitControls 处理本次输入前恢复控制器，
+      // 因此第一次按下或滚轮操作就能立即接管，无需再操作一次。
+      const interruptTour = () => stopTour();
+
+      renderer.domElement.addEventListener("pointerdown", interruptTour, {
+        capture: true,
+        passive: true
+      });
+
+      renderer.domElement.addEventListener("wheel", interruptTour, {
+        capture: true,
+        passive: true
+      });
+
+      controls.addEventListener("start", interruptTour);
+
+      window.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          stopTour();
+          showPoem(false);
+        }
+      });
+
+      function updateTour(delta) {
+        if (!tour) {
+          controls.update();
+          return;
+        }
+
+        const activeTour = tour;
+        activeTour.elapsed += delta;
+
+        const total = activeTour.approach + activeTour.duration;
+
+        if (activeTour.elapsed < activeTour.approach) {
+          const t = smooth(activeTour.elapsed / activeTour.approach);
+
+          camera.position.lerpVectors(
+            activeTour.fromPosition,
+            activeTour.entryPosition,
+            t
+          );
+          camera.position.y += Math.sin(Math.PI * t) * activeTour.lift;
+
+          controls.target.lerpVectors(
+            activeTour.fromTarget,
+            activeTour.entryTarget,
+            t
+          );
+        } else {
+          const progress = clamp(
+            (activeTour.elapsed - activeTour.approach) / activeTour.duration,
+            0, 1
+          );
+
+          sampleRoute(
+            activeTour.index,
+            progress,
+            sampledPosition,
+            sampledTarget
+          );
+
+          camera.position.copy(sampledPosition);
+          controls.target.copy(sampledTarget);
+        }
+
+        camera.lookAt(controls.target);
+
+        progressElement.style.transform =
+          `scaleX(${Math.min(1, activeTour.elapsed / total)})`;
+
+        if (activeTour.elapsed >= total) stopTour(true);
+      }
+
+      // =========================================================
+      // 9. 自适应构图与动画循环。
+      //    桌面为左侧导航让出空间；手机将主体抬高，避开底部面板。
+      // =========================================================
+      function resize() {
+        const width = Math.max(1, window.innerWidth);
+        const height = Math.max(1, window.innerHeight);
+
+        const pixelRatio = Math.min(
+          window.devicePixelRatio || 1,
+          matchMedia("(pointer: coarse)").matches ? 1.25 : 1.6,
+          Math.sqrt(2800000 / (width * height))
+        );
+
+        renderer.setPixelRatio(pixelRatio);
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+
+        if (width > 680) {
+          const sidebarWidth = width > 900 ? 292 : 260;
+          camera.setViewOffset(
+            width, height,
+            -Math.min(width * 0.10, sidebarWidth * 0.43),
+            0,
+            width, height
+          );
+        } else {
+          camera.setViewOffset(
+            width, height,
+            0, height * 0.105,
+            width, height
+          );
+        }
+
+        camera.updateProjectionMatrix();
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+      resize();
+
+      let previousTime = performance.now();
+      let waterTime = 0;
+      let firstFrame = true;
+
+      // 页面转入后台时暂停时间推进，返回后不会突然跳过巡航路线。
+      document.addEventListener("visibilitychange", () => {
+        previousTime = performance.now();
+      });
+
+      renderer.setAnimationLoop(now => {
+        const delta = Math.min(Math.max((now - previousTime) / 1000, 0), 0.05);
+        previousTime = now;
+
+        if (document.hidden) return;
+
+        waterTime += delta;
+        waterUniforms.uTime.value = waterTime;
+
+        if (Math.abs(requestedLight - lightAmount) > 0.0001) {
+          lightAmount +=
+            (requestedLight - lightAmount) * (1 - Math.exp(-delta * 2.4));
+
+          if (Math.abs(requestedLight - lightAmount) < 0.0001) {
+            lightAmount = requestedLight;
+          }
+
+          applyLighting(lightAmount);
+        }
+
+        updateTour(delta);
+
+        // 天球随相机平移，远处天空始终没有边界。
+        sky.position.copy(camera.position);
+        renderer.render(scene, camera);
+
+        if (firstFrame) {
+          firstFrame = false;
+          loading.classList.add("ready");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
