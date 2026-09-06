@@ -19,8 +19,10 @@ imports={'imports':{'three':'https://cdn.jsdelivr.net/npm/three@0.170.0/build/th
 page,count=re.subn(r'<script type="importmap">.*?</script>',lambda _: '<script type="importmap">'+json.dumps(imports)+'</script>',page,flags=re.S)
 assert count==1,'Expected one import map'
 model=base64.b64encode((ROOT/'assets/guanque-exploration.glb').read_bytes()).decode('ascii')
+interior=base64.b64encode((ROOT/'assets/guanque-interior.glb').read_bytes()).decode('ascii')
 audio={'audio/'+p.name:'data:audio/mpeg;base64,'+base64.b64encode(p.read_bytes()).decode('ascii') for p in sorted((ROOT/'assets/audio').glob('*.mp3'))}
 assets='<script id="guanque-model" type="application/octet-stream">'+model+'</script>\n'
+assets+='<script id="guanque-interior" type="application/octet-stream">'+interior+'</script>\n'
 assets+='<script id="guanque-audio" type="application/json">'+json.dumps(audio,separators=(',',':'))+'</script>\n'
 page=page.replace('<script type="module">',assets+'<script type="module">',1)
 args.output.parent.mkdir(parents=True,exist_ok=True)
