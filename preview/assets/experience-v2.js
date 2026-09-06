@@ -264,8 +264,8 @@ class Soundscape {
 }
 
 // Interior geometry is optional and loads only when the visitor opens the section.
-function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, assetURL,
-  beforeEnter, afterExit, flyTo, notify, showDetail, setMode }) {
+function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, exterior, assetURL,
+  beforeEnter, afterExit, onLayoutChange, flyTo, notify, showDetail, setMode }) {
   const $ = id => document.getElementById(id);
   const button = $('interior-toggle');
   const panel = $('interior-panel');
@@ -342,6 +342,23 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
     $('interior-spread').textContent = spreadTarget ? '合拢九层 ↙' : '展开九层 ↗';
     caption();
     refreshExterior();
+    onLayoutChange();
+  }
+  function viewingRect() {
+    const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
+    const phone = width <= 720;
+    const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
+    const controls = document.querySelector('.top-controls').getBoundingClientRect();
+    const bottom = phone ? sidebar.top - 12 : height - 64;
+    const top = Math.min(bottom - 96, (phone ? $('interior-legend').getBoundingClientRect().bottom : controls.bottom) + 14);
+    return { width, height, left: phone ? 16 : sidebar.right + 24, right: width - 16, top, bottom };
+  }
+  function layout() {
+    const rect = viewingRect();
+    camera.setViewOffset(rect.width, rect.height,
+      (rect.width - rect.left - rect.right) / 2,
+      (rect.height - rect.top - rect.bottom) / 2, rect.width, rect.height);
+    camera.updateProjectionMatrix();
   }
   function focus() {
     if (!root || !active) return;
@@ -361,11 +378,21 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
     }
     if (bounds.isEmpty()) return;
     const target = bounds.getCenter(new THREE.Vector3());
-    const size = bounds.getSize(new THREE.Vector3());
-    const distance = selected === 'all'
-      ? Math.max(110, size.x * 1.65, size.y * 2.35, size.z * 1.95)
-      : Math.max(75, size.x * 1.45, size.y * 1.85, size.z * 1.7);
-    const offset = new THREE.Vector3(.55, selected === 'all' ? .38 : .92, 1).normalize().multiplyScalar(distance);
+    const direction = new THREE.Vector3(.55, selected === 'all' ? .38 : .92, 1).normalize();
+    const right = new THREE.Vector3().crossVectors(camera.up, direction).normalize();
+    const up = new THREE.Vector3().crossVectors(direction, right).normalize();
+    const rect = viewingRect();
+    const tangent = Math.tan(THREE.MathUtils.degToRad(camera.getEffectiveFOV()) / 2);
+    const fitX = Math.max(.001, tangent * camera.aspect * (rect.right - rect.left) / rect.width * .9);
+    const fitY = Math.max(.001, tangent * (rect.bottom - rect.top) / rect.height * .9);
+    let distance = selected === 'all' ? 110 : 75;
+    // Fit every corner into the canvas area left clear by the controls.
+    for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+      const corner = new THREE.Vector3(x, y, z).sub(target);
+      const depth = corner.dot(direction);
+      distance = Math.max(distance, depth + Math.abs(corner.dot(right)) / fitX, depth + Math.abs(corner.dot(up)) / fitY);
+    }
+    const offset = direction.multiplyScalar(distance);
     const label = selected === 'all' ? '九层结构 · 示意剖视' : INTERIOR.storeys[Number(selected)].label + ' · 结构示意';
     flyTo(target.clone().add(offset), target, { duration: 2.7, label });
   }
@@ -433,7 +460,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
     apply(); focus();
   });
   document.querySelectorAll('[data-interior-mode]').forEach(el => el.addEventListener('click', () => {
-    mode = el.dataset.interiorMode; apply();
+    mode = el.dataset.interiorMode; apply(); focus();
     setMode(mode === 'section' ? '内部结构 · 半剖示意' : '内部结构 · 骨架示意');
   }));
   $('section-depth').addEventListener('input', event => {
@@ -456,7 +483,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
     ], source: INTERIOR.sources[0]
   }));
   return {
-    get active() { return active; }, exit, refreshExterior,
+    get active() { return active; }, exit, refreshExterior, layout, reframe: focus,
     tick(seconds) {
       if (!active || !root || Math.abs(spread-spreadTarget) < .001) return;
       spread += (spreadTarget-spread)*(1-Math.exp(-seconds*4));
@@ -1739,9 +1766,10 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
         renderer.shadowMap.needsUpdate = true;
       }
 
-      interiorExplorer = createInteriorExplorer({ THREE, GLTFLoader, scene, renderer,
+      interiorExplorer = createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera,
         exterior: () => model.scene, assetURL, flyTo, notify, showDetail, setMode,
         afterExit: focusOverview,
+        onLayoutChange: resize,
         beforeEnter: () => {
           haltMotion(); closeDetail(); highlightPart(null); showPoem(false); resetStructure(); setTime(false);
           explosion = 0; layerGroups.forEach(group => { group.position.y = 0; });
@@ -1914,13 +1942,14 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
         const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.25 : 1.6, Math.sqrt(2800000 / (width * height))));
         renderer.setSize(width, height); camera.aspect = width / height;
-        if (width > 720) {
+        if (interiorExplorer?.active) interiorExplorer.layout();
+        else if (width > 720) {
           const sidebarWidth = width > 1050 ? 300 : 267;
           camera.setViewOffset(width, height, -Math.min(width * .1, sidebarWidth * .44), 0, width, height);
         } else camera.setViewOffset(width, height, 0, height * .13, width, height);
         camera.updateProjectionMatrix(); refreshLayoutBounds();
       }
-      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('resize', () => { resize(); interiorExplorer?.reframe(); }, { passive: true });
       const sidebarObserver = new ResizeObserver(refreshLayoutBounds);
       sidebarObserver.observe(document.querySelector('.sidebar'));
       resize();
