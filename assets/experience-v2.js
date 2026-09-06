@@ -245,7 +245,7 @@ function assetURL(path) {
       if (embeddedAudioMap[path]) return embeddedAudioMap[path];
     } else if (embeddedAudioMap && embeddedAudioMap[path]) return embeddedAudioMap[path];
   }
-  return new URL('./assets/' + path + '?v=521981212ec3', document.baseURI).href;
+  return new URL('./assets/' + path + '?v=d336b202dc84', document.baseURI).href;
 }
 
 
