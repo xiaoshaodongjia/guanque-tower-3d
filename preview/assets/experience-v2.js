@@ -4,7 +4,7 @@ const ASSET_VERSIONS = {"guanque-fast.glb":"9f505e58ea21","guanque-exploration.g
 const MODEL_ASSETS = {"fast":{"path":"guanque-fast.glb","bytes":8235796},"fine":{"path":"guanque-exploration.glb","bytes":20221452}};
 const ARCHITECTURE = {"revision":"engineering-reference-2026-09-06","units":"metres","totalHeight":73.9,"entranceElevation":16.5,"knownStructuralElevations":{"main4":38.13,"main5":47.73},"podiumStoreys":3,"mainStoreys":6,"visibleStoreys":[1,4,6],"elevationFrom":[0.0,18.8,41.2,75.47432708740234],"elevationTo":[0.0,16.5,38.13,73.9],"outerColumnDiameters":[1.0,0.85,0.75,0.7],"innerColumnDiameters":[1.2,1.1,1.0,0.9],"fifthStoreyAxisInset":0.5,"extent":"Exterior reference model; no measured interior plan. Missing levels and plan dimensions are not asserted.","sources":["http://sxgql.com/?about/","https://www.gc5.com/jzgc/jzsg/10190840.html","http://123.57.212.98/html/tm/29/38/69/content/1433.html"]};
 const INTERIOR = {"revision":"interior-schematic-2026-09-06","units":"metres","storeys":[{"id":"p1","label":"台基一层","z":0.9,"known":true,"source":"施工正文：底层室内地坪相对首层 −15.60 m。","width":62,"depth":44,"index":0,"relativeZ":-15.6,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p2","label":"台基二层","z":6.1,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":62,"depth":44,"index":1,"relativeZ":-10.4,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p3","label":"台基三层","z":11.3,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":60,"depth":42,"index":2,"relativeZ":-5.2,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m1","label":"楼身一层","z":16.5,"known":true,"source":"施工正文：±0.00 为楼身首层室内地坪，周边地面为 −16.50 m。","width":35,"depth":24,"index":3,"relativeZ":0.0,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m2","label":"楼身二层","z":23.71,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":35,"depth":24,"index":4,"relativeZ":7.21,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m3","label":"楼身三层","z":30.92,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":32,"depth":22,"index":5,"relativeZ":14.42,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m4","label":"楼身四层","z":38.13,"known":true,"source":"施工正文：第四层结构范围从相对首层 +21.63 m 开始。","width":29,"depth":20,"index":6,"relativeZ":21.63,"height":9.6,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m5","label":"楼身五层","z":47.73,"known":true,"source":"施工正文：第五层起点相对首层 +31.23 m；外槽柱轴线在本层内移 0.50 m。","width":28,"depth":19,"index":7,"relativeZ":31.23,"height":5.95021,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m6","label":"楼身六层","z":53.68021,"known":false,"source":"施工正文确认其对应外观第三层；本层高度沿用已校正的照片模型。","width":26,"depth":16,"index":8,"relativeZ":37.18021,"height":7.41979,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"}],"scope":"结构示意：楼层总数和部分标高有施工资料支持；平面、部分层高、楼梯及电梯尺寸推定。","supported":["台基三层、楼身六层","楼身 20 根内柱：12 根结合两处楼梯间剪力墙，8 根独立","台基方柱、楼身圆柱","楼身 4–5、8–9 轴与 E–G 轴间设楼梯、电梯及剪力墙","内柱直径 1.20、1.10、1.00、0.90 m 的变径序列"],"estimated":["全部水平轴线间距与楼板轮廓","台基二、三层与楼身二、三、六层标高","柱径变更与楼面标高的简化对应","两侧交通区的绝对位置、剪力墙厚度、梯段与井道尺寸"],"notModeled":["当前展陈和房间用途","全部实际楼梯、电梯数量及精确平面","钢筋与机电管线"],"sources":["https://www.gc5.com/jzgc/jzsg/10190840.html","http://shigongdaquan.max.book118.com/01.公共设施施工组织设计/某楼复建工程施工组织设计方案.htm"],"bytes":3004400,"triangles":35040,"meshes":61};
-const FLOOR_STORIES = [{"id":"p1","title":"把高楼托在地面之上","lead":"脚下的高台，也是楼阁的一部分。","paragraphs":["外面看去厚重的台基，内部实际分成三层。施工正文将台基底层地坪记为首层地坪以下 15.60 米；按周边地面换算，这里约为地面以上 0.90 米。","数字导览从柱、梁与楼板之间，带你认识高台的内部空间。眼前的柱位、洞口和交通区仍是结构示意，不能据此判断真实设备或展厅的位置。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"外面厚重的高台，内部也有三层空间。这里是台基一层。柱、梁与楼板共同托起楼阁；眼前的布局，是依据公开施工资料制作的结构示意。","audio":null},{"id":"p2","title":"高台里的三重空间","lead":"外观的一座高台，藏着内部的层次。","paragraphs":["鹳雀楼的内部楼层，不能只靠数屋檐来判断。台基内部三层与楼身六层合在一起，构成这次数字导览的九个层次。","这一层的确切标高尚缺完整图纸，模型暂按台基高度区间等分。沿着同一套柱、梁与楼板向上看，可以理解中空高台如何组织空间。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"来到台基二层，试着把目光从楼板移向柱列。外观的一座高台，内部还有三重空间。这里的层高暂作推定，帮助我们理解楼阁从下到上的结构关系。","audio":null},{"id":"p3","title":"从高台走向楼阁","lead":"登临，先从高度的变化开始。","paragraphs":["从周边地面到楼身首层地坪，高差约 16.5 米。外部的石阶与月台，把这段高度转化为拾级而上的登临体验。","台基三层位于这段过渡的上部。继续上楼，就进入楼身一层。数字漫游把内外两种登临方式联系起来，具体梯段与楼层衔接仍待完整 CAD 核对。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"从周边地面到楼身首层，高差约十六点五米。石阶与月台，让登楼成为一步步展开的过程。再向上一层，我们便从高台走入楼身。","audio":null},{"id":"m1","title":"河畔起高楼","lead":"从这一层，先听古楼的来处。","paragraphs":["据景区介绍，鹳雀楼始建于北周，最初具有军事戍楼的用途，因鹳雀常来栖息而得名。楼临黄河、远望中条，地理位置与登临视野一起构成了它的记忆。","眼前的三维模型表现的是现代复建楼。复建工程于 1997 年启动，2002 年开放；古楼的故事，借新的建筑空间继续被人们讲述。"],"source":"http://sxgql.com/?about/","narration":"欢迎走进楼身一层。鹳雀楼的故事，从黄河岸边开始。据景区介绍，古楼始建于北周，因鹳雀时常栖息而得名。今天看到的，是一九九七年启动重建、二零零二年开放的复建楼。","audio":null},{"id":"m2","title":"二十字里的山河","lead":"一首短诗，把登临写成了千年的记忆。","paragraphs":["“白日依山尽，黄河入海流。欲穷千里目，更上一层楼。”王之涣的《登鹳雀楼》只有四句二十字，却把落日、大河与登高的动作连在了一起。","前两句展开眼前山河，后两句把视线引向更远的地方。此层的数字主题从诗意出发，不代表这里真实设有某一座诗歌展厅。"],"source":"http://sxgql.com/?about/","narration":"白日依山尽，黄河入海流。欲穷千里目，更上一层楼。四句二十字，从眼前的山河，写到更远的视野。来到这一层，让我们先停一步，再读这首熟悉的唐诗。","audio":null},{"id":"m3","title":"数屋檐，也数楼层","lead":"从楼内看，层次有了另一种读法。","paragraphs":["复建楼外观显出三层，楼身内部却分为六层。施工资料说明：外观第二层对应楼身第四层，外观第三层对应楼身第六层。","因此，眼前的楼身三层，还处在外观下部的体量中。上到下一层，就进入外观中层所在的高度区间。模型用楼板把这些不易从外面看清的关系展开。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"数屋檐，不等于数楼层。复建楼外观显出三层，楼身内部却有六层。外观的中层，对应楼身第四层。再向上一层，就能把外观与内部的编号联系起来。","audio":null},{"id":"m4","title":"柱与墙，一起托住楼阁","lead":"仿古的外观之下，是现代结构。","paragraphs":["复建楼采用框架剪力墙结构，并组合预制与现浇的仿古混凝土构件。它以现代工程方法，表现柱、枋、斗拱与层檐的建筑节奏。","施工正文提到 20 根内柱，其中 12 根与两处楼梯间剪力墙结合，8 根独立。模型据此表达柱与墙的关系；这一层的标高起点，换算为周边地面以上 38.13 米。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"仿古的外观之下，是现代的框架剪力墙结构。公开施工资料记载了二十根内柱，其中十二根结合两处剪力墙，八根独立。此刻，我们可以从楼内读懂柱与墙共同承托的关系。","audio":null},{"id":"m5","title":"向内收的半米","lead":"一个轴线变化，让上部体量更为收敛。","paragraphs":["施工方案记载，在第五层平面处，外槽柱轴线向内移动 500 毫米。这是有明确层位的构造调整，不能理解为每上一层都固定向内收半米。","本模型将这一关系落实在上部柱轴线与外观比例中。站在楼内，再回想远处所见的轮廓，可以把具体尺寸与整体形态联系起来。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"来到楼身五层，留意上部向内收的关系。施工方案记载，这一层的外槽柱轴线向内移动五百毫米。半米的调整，连接着结构的尺寸与楼阁的整体轮廓。","audio":null},{"id":"m6","title":"更上一层楼","lead":"走到高处，再把目光交给山河。","paragraphs":["楼身六层对应外观的第三层。包括台基与最高脊饰在内，复建楼总高 73.9 米；楼层地坪、屋顶和最高大吻，属于不同的高度基准。","这次数字登临，从台基与柱梁走到楼阁高处。回到“更上一层楼”，也可以把它读作一次不断拓展视野的邀请。此处故事与路线为数字导览编排，不表示真实开放区域。"],"source":"http://sxgql.com/?about/","narration":"我们来到楼身六层，这里对应外观的第三层。从高台、柱梁，到层檐与屋顶，楼阁的关系在一路登临中逐渐清晰。更上一层楼，也是在邀请我们，把目光放得更远。","audio":null}];
+const FLOOR_STORIES = [{"id":"p1","title":"把高楼托在地面之上","lead":"脚下的高台，也是楼阁的一部分。","paragraphs":["外面看去厚重的台基，内部实际分成三层。施工正文将台基底层地坪记为首层地坪以下 15.60 米；按周边地面换算，这里约为地面以上 0.90 米。","数字导览从柱、梁与楼板之间，带你认识高台的内部空间。眼前的柱位、洞口和交通区仍是结构示意，不能据此判断真实设备或展厅的位置。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"外面厚重的高台，内部也有三层空间。这里是台基一层。柱、梁与楼板共同托起楼阁；眼前的布局，是依据公开施工资料制作的结构示意。","kind":"structure","audio":null},{"id":"p2","title":"高台里的三重空间","lead":"外观的一座高台，藏着内部的层次。","paragraphs":["鹳雀楼的内部楼层，不能只靠数屋檐来判断。台基内部三层与楼身六层合在一起，构成这次数字导览的九个层次。","这一层的确切标高尚缺完整图纸，模型暂按台基高度区间等分。沿着同一套柱、梁与楼板向上看，可以理解中空高台如何组织空间。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"来到台基二层，试着把目光从楼板移向柱列。外观的一座高台，内部还有三重空间。这里的层高暂作推定，帮助我们理解楼阁从下到上的结构关系。","kind":"structure","audio":null},{"id":"p3","title":"从高台走向楼阁","lead":"登临，先从高度的变化开始。","paragraphs":["从周边地面到楼身首层地坪，高差约 16.5 米。外部的石阶与月台，把这段高度转化为拾级而上的登临体验。","台基三层位于这段过渡的上部。继续上楼，就进入楼身一层。数字漫游把内外两种登临方式联系起来，具体梯段与楼层衔接仍待完整 CAD 核对。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"从周边地面到楼身首层，高差约十六点五米。石阶与月台，让登楼成为一步步展开的过程。再向上一层，我们便从高台走入楼身。","kind":"structure","audio":null},{"id":"m1","title":"河畔起高楼","lead":"从这一层，先听古楼的来处。","paragraphs":["据景区介绍，鹳雀楼始建于北周，最初具有军事戍楼的用途，因鹳雀常来栖息而得名。楼临黄河、远望中条，地理位置与登临视野一起构成了它的记忆。","眼前的三维模型表现的是现代复建楼。复建工程于 1997 年启动，2002 年开放；古楼的故事，借新的建筑空间继续被人们讲述。"],"source":"http://sxgql.com/?about/","narration":"欢迎走进楼身一层。鹳雀楼的故事，从黄河岸边开始。据景区介绍，古楼始建于北周，因鹳雀时常栖息而得名。今天看到的，是一九九七年启动重建、二零零二年开放的复建楼。","kind":"story","audio":null},{"id":"m2","title":"二十字里的山河","lead":"一首短诗，把登临写成了千年的记忆。","paragraphs":["“白日依山尽，黄河入海流。欲穷千里目，更上一层楼。”王之涣的《登鹳雀楼》只有四句二十字，却把落日、大河与登高的动作连在了一起。","前两句展开眼前山河，后两句把视线引向更远的地方。此层的数字主题从诗意出发，不代表这里真实设有某一座诗歌展厅。"],"source":"http://sxgql.com/?about/","narration":"白日依山尽，黄河入海流。欲穷千里目，更上一层楼。四句二十字，从眼前的山河，写到更远的视野。来到这一层，让我们先停一步，再读这首熟悉的唐诗。","kind":"story","audio":null},{"id":"m3","title":"楼隐，诗传","lead":"建筑曾经消失，登临的记忆仍在。","paragraphs":["据景区介绍，古鹳雀楼曾毁于战火，此后长期未获重建。这里不把今天的复建楼当成从古代原样留存的建筑。","楼可以隐去，诗却一代代传下来。《登鹳雀楼》让黄河岸边的登临经验越过时间，也让后来的重建有了人们熟悉的文化记忆。"],"source":"http://sxgql.com/?about/","narration":"古鹳雀楼曾毁于战火，此后长期未获重建。楼可以隐去，诗却一代代传下来。黄河岸边的登临记忆，因这首唐诗延续至今。","kind":"story","audio":null},{"id":"m4","title":"重建，再续登临","lead":"新的楼阁，回应久远的文化记忆。","paragraphs":["据景区介绍，鹳雀楼于 1997 年 12 月启动重建，2002 年 9 月 26 日正式对外开放。今天眼前的楼阁，是这次现代复建的成果。","复建采用仿唐形制，把高台、柱列与层檐重新带到黄河岸边。它延续的是古楼与诗文的文化记忆，具体空间和工程构造属于现代建筑。"],"source":"http://sxgql.com/?about/","narration":"一九九七年十二月，鹳雀楼启动重建。二零零二年九月二十六日，复建楼正式对外开放。新的楼阁以仿唐形制，回应古楼与诗文留下的文化记忆。","kind":"story","audio":null},{"id":"m5","title":"唐风与今工","lead":"檐下的古意，来自今天的建造。","paragraphs":["复建楼采用框架剪力墙结构，并组合预制与现浇的仿古混凝土构件。眼前的柱、枋、斗拱和层檐，以现代工程方法表现仿唐楼阁的建筑节奏。","施工方案记载，在楼身第五层平面处，外槽柱轴线向内移动 500 毫米。这一处明确的调整，让我们能把上部收敛的轮廓，与具体的建造尺寸联系起来。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"仿古的外观之下，是现代的框架剪力墙结构。柱、枋、斗拱与层檐，共同表现仿唐楼阁的节奏。在楼身五层，外槽柱轴线向内移动半米，把具体尺寸与楼阁轮廓联系起来。","kind":"story","audio":null},{"id":"m6","title":"更上一层楼","lead":"走到高处，再把目光交给山河。","paragraphs":["楼身六层对应外观的第三层。包括台基与最高脊饰在内，复建楼总高 73.9 米；楼层地坪、屋顶和最高大吻，属于不同的高度基准。","这次数字登临，从台基与柱梁走到楼阁高处。回到“更上一层楼”，也可以把它读作一次不断拓展视野的邀请。此处故事与路线为数字导览编排，不表示真实开放区域。"],"source":"http://sxgql.com/?about/","narration":"我们来到楼身六层，这里对应外观的第三层。从高台、柱梁，到层檐与屋顶，楼阁的关系在一路登临中逐渐清晰。更上一层楼，也是在邀请我们，把目光放得更远。","kind":"story","audio":null}];
 let embeddedAudioMap;
 function assetURL(path) {
   if (path.startsWith('audio/')) {
@@ -48,7 +48,7 @@ const EXPERIENCE = {
     { date: '唐代', title: '诗人与登临', lead: '一首唐诗，把这座楼带向千年。', paragraphs: ['唐人登临题咏者甚多，王之涣《登鹳雀楼》尤为人熟知。诗从落日与黄河写起，把眼前风景推向更远的境界。', '四句二十字，让地理上的一座楼，也成为人们心中关于远望与向上的意象。'] },
     { date: '古楼毁损后', title: '楼隐，诗传', lead: '建筑一度消失，登临的诗意仍在。', paragraphs: ['景区介绍记载，古楼毁于战火，此后长期未获重建。关于毁损年代，不同材料的表述需要进一步核对，这里不作具体年份复原。', '今天仍可通过诗文和相关记载理解古楼的影响。此页呈现的是现代复建楼的外观参考模型。'] },
     { date: '1997 年', title: '重建启幕', lead: '在新的时代，回应旧日的登临。', paragraphs: ['据景区介绍，鹳雀楼于 1997 年 12 月开始重建。', '复建采用仿唐形制，以新的建筑与景区空间，延续这处文化地标的历史记忆。'] },
-    { date: '2002 年', title: '重见鹳雀楼', lead: '2002 年 9 月 26 日，正式对外开放。', paragraphs: ['复建后的鹳雀楼外观四檐三层，楼身内部六层，加上台基三层共九层，总高 73.9 米。外观层次与内部楼层并不是同一概念。', '数字漫游可查看九层结构剖视，也可进入楼内行走、沿示意楼梯登层，并阅读每层自动展开的主题故事。内部平面与楼梯尺寸仍属示意，故事主题不代表实际展厅安排。'] }
+    { date: '2002 年', title: '重见鹳雀楼', lead: '2002 年 9 月 26 日，正式对外开放。', paragraphs: ['复建后的鹳雀楼外观四檐三层，楼身内部六层，加上台基三层共九层，总高 73.9 米。外观层次与内部楼层并不是同一概念。', '数字漫游可查看九层结构剖视，也可进入楼内行走、沿示意楼梯登层，并阅读楼身六层自动展开的主题故事；台基三层可主动查看结构说明。内部平面与楼梯尺寸仍属示意，故事主题不代表实际展厅安排。'] }
   ],
   stamps: [
     { id: 'river', name: '望河', glyph: '河', hint: '完成第一境，或欣赏「黄河入海流」' },
@@ -314,13 +314,15 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   const $ = id => document.getElementById(id);
   const scale = 1.4, eye = 1.65, speed = 2.15;
   const levels = INTERIOR.storeys;
+  const storyLevels = FLOOR_STORIES.filter(story => story.kind === 'story');
+  const isStoryFloor = index => FLOOR_STORIES[index].kind === 'story';
   const keys = new Set(), held = new Map();
   let active = false, floor = 3, lastStory = -1, nearStory = false;
   let yaw = 0, pitch = -.04, dragging = null, transition = null, saved = null;
   let walkingLastFrame = false;
   const direction = new THREE.Vector3(), nextPosition = new THREE.Vector3();
   const savedVisits = readPreference('guanque-floor-stories-v1', { floors: [] }).floors;
-  const visited = new Set(Array.isArray(savedVisits) ? savedVisits.filter(id => levels.some(level => level.id === id)) : []);
+  const visited = new Set(Array.isArray(savedVisits) ? savedVisits.filter(id => storyLevels.some(story => story.id === id)) : []);
   const decor = new THREE.Group(); decor.name = '数字入楼 · 导览牌与入口踏步'; decor.visible = false; scene.add(decor);
   const markers = new THREE.Group(); decor.add(markers);
   const light = new THREE.PointLight('#ffe3b1', 25, 30, 1.4); decor.add(light);
@@ -335,7 +337,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     ctx.fillStyle = '#9fad9a'; ctx.font = '22px "Songti SC",serif'; ctx.fillText('数字导览 · 空间示意',384,255);
     const texture = new THREE.CanvasTexture(image); texture.colorSpace = THREE.SRGBColorSpace; return texture;
   }
-  const storyTextures = FLOOR_STORIES.map((story,i) => signTexture(story.title,levels[i].label+' · 本层故事'));
+  const storyTextures = FLOOR_STORIES.map((story,i) => signTexture(story.title,levels[i].label+(isStoryFloor(i)?' · 本层故事':' · 结构说明')));
   const board = new THREE.Mesh(new THREE.PlaneGeometry(3.6*scale,1.5*scale),new THREE.MeshBasicMaterial({map:storyTextures[3],side:THREE.DoubleSide}));
   markers.add(board);
   const stairTexture = signTexture('楼梯','使用上楼 / 下楼，沿梯段前往邻层');
@@ -366,7 +368,8 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     const level=levels[floor];
     $('walk-floor').textContent=level.label;
     $('walk-storey').value=String(floor);
-    $('walk-progress').textContent=`故事足迹 ${visited.size} / 9`;
+    $('walk-progress').textContent=`故事足迹 ${visited.size} / ${storyLevels.length}`;
+    $('walk-story-again').textContent=isStoryFloor(floor)?'重读本层故事':'本层结构说明';
     $('walk-down').disabled=!!transition || floor===0;
     $('walk-up').disabled=!!transition || floor===8;
     $('walk-storey').disabled=!!transition;
@@ -379,15 +382,20 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   function showStory() {
     if (!active || transition) return;
     const story=FLOOR_STORIES[floor], level=levels[floor];
-    visited.add(level.id); savePreference('guanque-floor-stories-v1',{floors:[...visited]});
-    $('walk-story-floor').textContent=level.label+' · 到层故事';
+    if(isStoryFloor(floor)){visited.add(level.id);savePreference('guanque-floor-stories-v1',{floors:[...visited]});}
+    const label=isStoryFloor(floor)?'楼层故事':'台基结构说明';
+    $('walk-story').setAttribute('aria-label',label);
+    $('walk-close-story').setAttribute('aria-label','收起'+label);
+    $('walk-story-floor').textContent=level.label+(isStoryFloor(floor)?' · 到层故事':' · 结构说明');
     $('walk-story-title').textContent=story.title;
     $('walk-story-lead').textContent=story.lead;
     $('walk-story-body').replaceChildren(...story.paragraphs.map(text=>{const p=document.createElement('p');p.textContent=text;return p;}));
     $('walk-story-source').href=story.source;
+    $('walk-story-source').textContent=isStoryFloor(floor)?'查阅故事依据 ↗':'查阅结构依据 ↗';
+    $('walk-story-scope').textContent=isStoryFloor(floor)?'六层故事为数字导览主题编排，不代表真实展厅用途。':'台基三层展示结构关系；平面与部分标高仍待完整 CAD 核对。';
     $('walk-read-story').hidden=!story.audio;
     $('walk-story').hidden=false;
-    $('walk-progress').textContent=`故事足迹 ${visited.size} / 9`;
+    $('walk-progress').textContent=`故事足迹 ${visited.size} / ${storyLevels.length}`;
     if (story.audio) sound.speak(story.audio);
   }
   function closeStory() { $('walk-story').hidden=true; sound.stopVoice(); }
@@ -399,7 +407,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-status').textContent='拖动画面环视 · W A S D 或方向键行走';
     setMode('入楼漫游 · '+levels[floor].label);
     nearStory=false;
-    if (lastStory!==floor) { lastStory=floor; showStory(); }
+    if (lastStory!==floor) { lastStory=floor; if(isStoryFloor(floor))showStory(); }
   }
   function warp(to,{route=null}={}) {
     if (!active || transition) return;
@@ -493,7 +501,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
           if(item.route){
             const lengths=[0];for(let i=1;i<item.route.length;i++)lengths.push(lengths[i-1]+item.route[i].distanceTo(item.route[i-1]));
             transition={kind:'stairs',points:item.route,lengths,total:lengths.at(-1),distance:0,to:item.to};
-            $('walk-fade').style.opacity='0';$('walk-status').textContent='沿楼梯前往'+levels[item.to].label+' · 到层后自动展开故事';
+            $('walk-fade').style.opacity='0';$('walk-status').textContent='沿楼梯前往'+levels[item.to].label+(isStoryFloor(item.to)?' · 到层后自动展开故事':' · 可主动查看结构说明');
           }else arrive();
         }
       }else if(transition?.kind==='stairs'){
@@ -513,7 +521,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
         const moving=!!(forward||right);
         if(moving!==walkingLastFrame){$('walk-status').textContent=moving?levels[floor].label+' · 正在行走':'拖动画面环视 · W A S D 或方向键行走';walkingLastFrame=moving;}
         const nearby=Math.hypot(camera.position.x/scale-3.4,camera.position.z/scale)<2.7;
-        if(nearby&&!nearStory)showStory();nearStory=nearby;
+        if(isStoryFloor(floor)&&nearby&&!nearStory)showStory();nearStory=nearby;
       }
       light.position.copy(camera.position);light.position.y+=.4*scale;
     }
@@ -598,7 +606,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
     document.querySelector('#view-explore .pane-note').textContent = active
       ? '从台基到楼顶，查看柱、梁、楼板和两侧交通区。'
       : '点选构件，或点击画面中的标记，靠近看一看。';
-    $('view-hint').textContent = walker.active ? '拖拽环视 · W A S D 行走 · E 上楼 / Q 下楼 · 到层出现故事' : active ? '拖拽查看骨架 · 选择楼层或移动剖切面' : '点击构件或标记，靠近读一座楼';
+    $('view-hint').textContent = walker.active ? '拖拽环视 · W A S D 行走 · E 上楼 / Q 下楼 · 楼身六层到层讲故事' : active ? '拖拽查看骨架 · 选择楼层或移动剖切面' : '点击构件或标记，靠近读一座楼';
     button.setAttribute('aria-pressed', String(active));
     button.textContent = active ? '返回外观探索' : '打开九层内部结构';
     document.querySelectorAll('[data-interior-mode]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.interiorMode === mode)));
