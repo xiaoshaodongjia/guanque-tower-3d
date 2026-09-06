@@ -7,10 +7,10 @@
   <meta name="description" content="鹳雀凌云：沿黄河游览鹳雀楼，听声景、识斗拱、赏唐诗，收集六枚山河印章，留下自己的观景明信片。">
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
-  <base href="../">
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=6436805fc7f6">
+
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=38b627bd4c4a">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
-  <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=dd3de10412c2" crossorigin="anonymous" fetchpriority="high">
+  <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=9f505e58ea21" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/addons/controls/OrbitControls.js">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/addons/loaders/GLTFLoader.js">
@@ -50,6 +50,18 @@
       <section id="view-explore" class="view-pane" role="tabpanel" aria-labelledby="tab-explore" hidden>
         <p class="pane-intro">从一片瓦，读懂一座楼。</p>
         <p class="pane-note">点选构件，或点击画面中的标记，靠近看一看。</p>
+        <button id="interior-toggle" class="outline-button interior-entry" aria-pressed="false">打开九层内部结构</button>
+        <div id="interior-panel" class="interior-panel" hidden>
+          <p class="interior-scope">结构示意 · 平面与部分层高推定</p>
+          <div class="interior-modes" role="group" aria-label="内部结构显示方式"><button data-interior-mode="section" aria-pressed="true">半剖楼阁</button><button data-interior-mode="skeleton" aria-pressed="false">只看骨架</button></div>
+          <label class="interior-label" for="interior-storey">按内部楼层查看</label>
+          <select id="interior-storey"><option value="all">全楼 · 九层结构</option></select>
+          <div class="section-heading"><span id="interior-floor-title">台基三层 · 楼身六层</span><button id="interior-spread" class="text-button" aria-pressed="false">展开九层 ↗</button></div>
+          <p id="interior-floor-note" class="microcopy"></p>
+          <div id="section-depth-control"><label class="interior-label" for="section-depth">外壳剖切位置 <output id="section-depth-value">中轴</output></label><input id="section-depth" type="range" min="-25" max="25" step="1" value="0"></div>
+          <p class="microcopy">楼梯、井道和柱位按资料关系示意，尺寸待完整 CAD 核对。</p>
+          <button id="interior-evidence" class="text-button">查看建模依据与推定范围 ↗</button>
+        </div>
         <div class="part-list" aria-label="选择建筑构件">
           <button data-part="bracket"><span class="part-glyph" aria-hidden="true">枓</span><span>檐下斗拱<small>层叠相承，向外出挑</small></span><span class="visited-mark"></span></button>
           <button data-part="tile"><span class="part-glyph" aria-hidden="true">瓦</span><span>灰陶筒瓦<small>一垄一垄，顺势排水</small></span><span class="visited-mark"></span></button>
@@ -62,7 +74,7 @@
           <div class="layer-filters" role="group" aria-label="按外观层次查看">
             <button data-tier="all" aria-pressed="true">全楼</button><button data-tier="0" aria-pressed="false">高台</button><button data-tier="1" aria-pressed="false">下层</button><button data-tier="2" aria-pressed="false">中层</button><button data-tier="3" aria-pressed="false">上层</button>
           </div>
-          <p class="microcopy">按外观层次拆解，便于观察楼身与屋檐。</p>
+          <p class="microcopy">台基内分三层，楼身内分六层。外观中层、上层分别对应楼身第四、第六层。</p>
         </div>
       </section>
 
@@ -127,6 +139,7 @@
     <p class="microcopy">原创五声音景 · 云扬合成男声<br>朗诵时配乐会轻轻降低。</p>
   </aside>
 
+  <div id="interior-legend" class="interior-legend" aria-live="polite" hidden><strong id="interior-legend-floor">九层结构示意</strong><span>平面与部分层高推定</span><div><i class="known-dot"></i>有标高依据 <i class="estimated-dot"></i>标高推定</div></div>
   <aside id="detail-panel" class="detail-panel" aria-label="探索详情" hidden>
     <button class="close-panel" id="close-detail" aria-label="收起探索详情">×</button>
     <p class="eyebrow" id="detail-eyebrow"></p><h2 id="detail-title"></h2><p class="detail-lead" id="detail-lead"></p><div id="detail-body"></div>
@@ -154,7 +167,7 @@
 
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button></div>
   <noscript><div class="no-script">请启用 JavaScript，进入鹳雀楼数字化漫游。</div></noscript>
-  
-  <script type="module" src="./assets/experience-v2.js?v=6436805fc7f6"></script>
+
+  <script type="module" src="./assets/experience-v2.js?v=38b627bd4c4a"></script>
 </body>
 </html>
