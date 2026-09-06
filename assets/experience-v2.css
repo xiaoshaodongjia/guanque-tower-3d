@@ -8,4 +8,9 @@
 @media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition-duration:0ms!important}}
 
 /* Keep the postcard action visible on shorter desktop windows. */
+.quality-toggle{background:rgba(9,17,17,.85);border:1px solid var(--line);font-size:11px;min-height:43px;min-width:72px;padding:8px 11px;white-space:nowrap;backdrop-filter:blur(14px)}
+.quality-toggle[aria-pressed=true]{color:var(--gold);border-color:#c9b48580;background:rgba(35,43,32,.92)}
+.quality-toggle[aria-busy=true]{opacity:.8;color:var(--gold)}
+@media(max-width:720px){.quality-toggle{font-size:10px;min-height:39px;min-width:60px;padding:8px 7px}}
+@media(max-width:360px){.quality-toggle{min-width:56px;padding-inline:5px}.top-controls .settings-toggle{padding-inline:8px}.top-controls .sound-bars{display:none}}
 @media(min-width:721px) and (max-height:760px){.stamp-grid{grid-template-columns:repeat(6,1fr);gap:4px;margin:14px 0 9px}.stamp{font-size:9px;gap:6px;padding:5px 0}.stamp-symbol{width:34px;height:34px;font-size:18px}.stamp small{display:none}.collection-progress{margin:8px 0 16px;font-size:10px}}

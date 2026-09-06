@@ -236,6 +236,9 @@ class Soundscape {
 }
 
 // Static hosting uses relative URLs; the standalone edition embeds its model and audio.
+// Model/audio cache keys depend only on their own bytes, never on a UI edit.
+const ASSET_VERSIONS = {"guanque-fast.glb":"dd3de10412c2","guanque-exploration.glb":"4141130fb892","audio/day.mp3":"49cd0b8c980b","audio/dusk.mp3":"6454c5fa922a","audio/part-bracket.mp3":"e106997c2a26","audio/part-column.mp3":"ece52e12a6e2","audio/part-podium.mp3":"b436a073e91c","audio/part-ridge.mp3":"b3476ebc6869","audio/part-tile.mp3":"5b4bf3bd5fa1","audio/poem-0.mp3":"8fec4ef4aa5d","audio/poem-1.mp3":"d26aed6c7370","audio/poem-2.mp3":"68180cf8b284","audio/poem-3.mp3":"74b1c47f992a","audio/river.mp3":"9d19e6affa7e","audio/scene-0.mp3":"d6f137606103","audio/scene-1.mp3":"33e97dd0dad1","audio/scene-2.mp3":"47bd9556f9fc","audio/scene-3.mp3":"4d091c123093","audio/wind.mp3":"4aa2ff8d4ce0"};
+const MODEL_ASSETS = {"fast":{"path":"guanque-fast.glb","bytes":6214140},"fine":{"path":"guanque-exploration.glb","bytes":17013608}};
 let embeddedAudioMap;
 function assetURL(path) {
   if (path.startsWith('audio/')) {
@@ -245,7 +248,8 @@ function assetURL(path) {
       if (embeddedAudioMap[path]) return embeddedAudioMap[path];
     } else if (embeddedAudioMap && embeddedAudioMap[path]) return embeddedAudioMap[path];
   }
-  return new URL('./assets/' + path + '?v=d336b202dc84', document.baseURI).href;
+  const version = ASSET_VERSIONS[path];
+  return new URL('./assets/' + path + (version ? '?v=' + version : ''), document.baseURI).href;
 }
 
 
@@ -477,10 +481,76 @@ function assetURL(path) {
       // 3. 保留外观层次与构件分组的实景参考模型。
       //    相同层次、构件类型与材质的几何体合并，兼顾细节与性能。
       // =========================================================
+      // 首次访问只请求流畅模型。独立 HTML 继续使用内嵌精细模型。
+      const embeddedModel = document.getElementById('guanque-model');
+      let modelQuality = embeddedModel ? 'fine' : 'fast';
+      const modelCache = new Map();
+      const modelLoads = new Map();
+      const anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+
+      function prepareModel(result) {
+        result.scene.name = '鹳雀楼 · 实景参考';
+        result.scene.scale.setScalar(1.4);
+        result.scene.traverse(object => {
+          if (!object.isMesh) return;
+          object.castShadow = true;
+          object.receiveShadow = true;
+          for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+            if (material.map) material.map.anisotropy = anisotropy;
+            if (material.normalMap) material.normalMap.anisotropy = anisotropy;
+          }
+        });
+        return result;
+      }
+
+      async function loadModelQuality(quality, report = () => {}) {
+        if (modelCache.has(quality)) return modelCache.get(quality);
+        if (modelLoads.has(quality)) return modelLoads.get(quality);
+        const task = (async () => {
+          const asset = MODEL_ASSETS[quality];
+          const abort = new AbortController();
+          let stallTimer;
+          const keepAlive = () => {
+            clearTimeout(stallTimer);
+            stallTimer = setTimeout(() => abort.abort(), 45000);
+          };
+          let buffer;
+          try {
+            keepAlive();
+            const response = await fetch(assetURL(asset.path), { signal: abort.signal });
+            if (!response.ok) throw new Error(`Model request failed: ${response.status}`);
+            if (response.body) {
+              const reader = response.body.getReader();
+              const chunks = [];
+              let loaded = 0;
+              while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                keepAlive(); chunks.push(value); loaded += value.byteLength;
+                // gzip 响应头中的长度是压缩量；流里是解压后的字节。
+                // 用构建时记录的原始大小计算，避免提前显示 100%。
+                report({ phase: 'download', percent: Math.min(99, Math.floor(loaded / asset.bytes * 100)) });
+              }
+              const bytes = new Uint8Array(loaded);
+              let offset = 0;
+              for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+              buffer = bytes.buffer;
+            } else buffer = await response.arrayBuffer();
+          } finally { clearTimeout(stallTimer); }
+          report({ phase: 'prepare', percent: 100 });
+          await new Promise(requestAnimationFrame);
+          const result = prepareModel(await new GLTFLoader().parseAsync(buffer, ''));
+          modelCache.set(quality, result);
+          return result;
+        })();
+        modelLoads.set(quality, task);
+        try { return await task; }
+        finally { modelLoads.delete(quality); }
+      }
+
       let model;
-      const embedded = document.getElementById('guanque-model');
-      if (embedded) {
-        let encoded = embedded.textContent.trim();
+      if (embeddedModel) {
+        let encoded = embeddedModel.textContent.trim();
         const padding = encoded.endsWith('==') ? 2 : encoded.endsWith('=') ? 1 : 0;
         const bytes = new Uint8Array(encoded.length / 4 * 3 - padding);
         const chunkLength = 262144;
@@ -493,29 +563,19 @@ function assetURL(path) {
             await new Promise(requestAnimationFrame);
           }
         }
-        encoded = ''; embedded.remove();
-        model = await new GLTFLoader().parseAsync(bytes.buffer, '');
+        encoded = ''; embeddedModel.remove();
+        model = prepareModel(await new GLTFLoader().parseAsync(bytes.buffer, ''));
+        modelCache.set('fine', model);
       } else {
-        model = await new GLTFLoader().loadAsync(assetURL('guanque-exploration.glb'), progress => {
-          loadingMessage.textContent = progress.total > 0
-            ? `正在构筑楼阁 · ${Math.min(100,Math.round(progress.loaded / progress.total * 100))}%`
-            : `正在构筑楼阁 · 已载入 ${(progress.loaded / 1048576).toFixed(1)} MB`;
+        model = await loadModelQuality('fast', progress => {
+          loadingMessage.textContent = progress.phase === 'prepare'
+            ? '楼阁已载入 · 正在准备光影'
+            : `正在载入楼阁 · ${progress.percent}%`;
         });
       }
       loadingMessage.textContent = '正在铺展山河与光影';
-      model.scene.name = "鹳雀楼 · 实景参考";
-      model.scene.scale.setScalar(1.4);
-      const anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-      model.scene.traverse(object => {
-        if (!object.isMesh) return;
-        object.castShadow = true;
-        object.receiveShadow = true;
-        for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
-          if (material.map) material.map.anisotropy = anisotropy;
-          if (material.normalMap) material.normalMap.anisotropy = anisotropy;
-        }
-      });
       scene.add(model.scene);
+
       renderer.domElement.addEventListener("webglcontextlost", event => {
         event.preventDefault();
         renderer.setAnimationLoop(null);
@@ -942,12 +1002,63 @@ function assetURL(path) {
       const pointer = new THREE.Vector2();
       const raycaster = new THREE.Raycaster();
       const modelCenter = V(0, 50, 0);
-      model.scene.traverse(object => {
-        if (object.userData.displayLayer) layerGroups.push(object);
-        if (object.isMesh) {
-          object.material = object.material.clone();
-          object.userData.baseEmissive = object.material.emissive?.clone();
-          modelMeshes.push(object);
+      function registerModelScene() {
+        layerGroups.length = 0;
+        modelMeshes.length = 0;
+        model.scene.traverse(object => {
+          if (object.userData.displayLayer) {
+            object.position.y = layerOffsets[object.userData.tier] * explosion;
+            object.visible = tierFilter === 'all' || object.userData.tier === Number(tierFilter);
+            layerGroups.push(object);
+          }
+          if (object.isMesh) {
+            if (!object.userData.interactionReady) {
+              object.material = object.material.clone();
+              object.userData.baseEmissive = object.material.emissive?.clone();
+              object.userData.interactionReady = true;
+            }
+            modelMeshes.push(object);
+          }
+        });
+        model.scene.updateMatrixWorld(true);
+        renderer.shadowMap.needsUpdate = true;
+      }
+      registerModelScene();
+
+      const qualityButton = $('quality-toggle');
+      qualityButton.hidden = !!embeddedModel;
+      qualityButton.disabled = false;
+      function updateQualityButton() {
+        const fine = modelQuality === 'fine';
+        qualityButton.textContent = '精细画质';
+        qualityButton.setAttribute('aria-pressed', String(fine));
+        qualityButton.setAttribute('aria-busy', 'false');
+        qualityButton.title = fine ? '已开启精细画质，点击切回流畅画质' : '当前为流畅画质，点击加载精细模型';
+      }
+      updateQualityButton();
+      qualityButton.addEventListener('click', async () => {
+        const nextQuality = modelQuality === 'fine' ? 'fast' : 'fine';
+        qualityButton.disabled = true;
+        qualityButton.setAttribute('aria-busy', 'true');
+        qualityButton.textContent = '载入 0%';
+        try {
+          // 下载期间保持当前场景运行，不重置镜头、分层或探索进度。
+          const next = await loadModelQuality(nextQuality, progress => {
+            qualityButton.textContent = progress.phase === 'prepare' ? '准备画质' : `载入 ${progress.percent}%`;
+          });
+          await renderer.compileAsync(next.scene, camera, scene);
+          scene.remove(model.scene);
+          model = next; modelQuality = nextQuality;
+          registerModelScene();
+          scene.add(model.scene);
+          highlightPart(selectedPart);
+          notify(nextQuality === 'fine' ? '精细画质已开启，可以近看瓦片与斗拱。' : '已切回流畅画质。');
+        } catch (error) {
+          console.warn('Model quality:', error);
+          notify('精细模型暂未载入，可继续游览，稍后再试。');
+        } finally {
+          qualityButton.disabled = false;
+          updateQualityButton();
         }
       });
       controls.minDistance = 7;

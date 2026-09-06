@@ -7,6 +7,8 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output',type=Path,default=ROOT/'dist/guanque-tower.html')
 args=parser.parse_args()
 page=(ROOT/'index.html').read_text(encoding='utf-8')
+# All local preloads belong to the hosted edition. The export embeds full detail.
+page=re.sub(r'<link data-online-preload\b[^>]*>','',page)
 css=(ROOT/'assets/experience-v2.css').read_text(encoding='utf-8')
 script=(ROOT/'assets/experience-v2.js').read_text(encoding='utf-8')
 page,count=re.subn(r'<link rel="stylesheet" href="\./assets/experience-v2\.css[^\"]*">',lambda _: '<style>\n'+css+'\n</style>',page)
