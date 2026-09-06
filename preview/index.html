@@ -8,7 +8,7 @@
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
 
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=b98d47ddd92b">
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=dd8eee9f882e">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=9f505e58ea21" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -50,7 +50,19 @@
       <section id="view-explore" class="view-pane" role="tabpanel" aria-labelledby="tab-explore" hidden>
         <p class="pane-intro">从一片瓦，读懂一座楼。</p>
         <p class="pane-note">点选构件，或点击画面中的标记，靠近看一看。</p>
+        <button id="enter-walk" class="primary-button interior-entry">入楼漫游 · 楼层故事</button>
         <button id="interior-toggle" class="outline-button interior-entry" aria-pressed="false">打开九层内部结构</button>
+        <div id="walk-panel" class="walk-panel" hidden>
+          <div class="section-heading"><strong id="walk-floor">楼身一层</strong><span id="walk-progress" class="microcopy">故事足迹 0 / 9</span></div>
+          <label class="interior-label" for="walk-storey">前往楼层</label><select id="walk-storey"></select>
+          <div class="walk-navigation">
+            <div class="walk-pad" role="group" aria-label="楼内移动"><button data-walk-move="forward" aria-label="向前走">↑</button><button data-walk-move="left" aria-label="向左走">←</button><button data-walk-move="back" aria-label="向后走">↓</button><button data-walk-move="right" aria-label="向右走">→</button></div>
+            <div class="walk-floor-actions"><div><button id="walk-down">下楼 ↓</button><button id="walk-up">上楼 ↑</button></div><button id="walk-story-again">重读本层故事</button><button id="walk-recenter">回到本层入口</button></div>
+          </div>
+          <p id="walk-status" class="walk-status" role="status">拖动画面环视 · W A S D 或方向键行走</p>
+          <button id="exit-walk" class="outline-button">返回结构剖视</button>
+          <p class="microcopy walk-scope">数字导览 · 平面与部分层高示意，楼层故事为主题编排。E 上楼，Q 下楼，Esc 退出。</p>
+        </div>
         <div id="interior-panel" class="interior-panel" hidden>
           <p class="interior-scope">结构示意 · 平面与部分层高推定</p>
           <div class="interior-modes" role="group" aria-label="内部结构显示方式"><button data-interior-mode="section" aria-pressed="true">半剖楼阁</button><button data-interior-mode="skeleton" aria-pressed="false">只看骨架</button></div>
@@ -140,6 +152,13 @@
   </aside>
 
   <div id="interior-legend" class="interior-legend" aria-live="polite" hidden><strong id="interior-legend-floor">九层结构示意</strong><span>平面与部分层高推定</span><div><i class="known-dot"></i>有标高依据 <i class="estimated-dot"></i>标高推定</div></div>
+  <div id="walk-fade" class="walk-fade" aria-hidden="true"></div>
+  <aside id="walk-story" class="walk-story" aria-label="楼层故事" aria-live="polite" hidden>
+    <button id="walk-close-story" class="close-panel" aria-label="收起楼层故事">×</button>
+    <p id="walk-story-floor" class="eyebrow"></p><h2 id="walk-story-title"></h2><p id="walk-story-lead" class="detail-lead"></p><div id="walk-story-body"></div>
+    <button id="walk-read-story" class="outline-button" hidden>听本层故事</button><a id="walk-story-source" class="source-link" target="_blank" rel="noopener noreferrer">查阅故事依据 ↗</a>
+    <p class="microcopy">楼层主题为数字导览编排，不代表真实展厅用途。</p>
+  </aside>
   <aside id="detail-panel" class="detail-panel" aria-label="探索详情" hidden>
     <button class="close-panel" id="close-detail" aria-label="收起探索详情">×</button>
     <p class="eyebrow" id="detail-eyebrow"></p><h2 id="detail-title"></h2><p class="detail-lead" id="detail-lead"></p><div id="detail-body"></div>
@@ -168,6 +187,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button></div>
   <noscript><div class="no-script">请启用 JavaScript，进入鹳雀楼数字化漫游。</div></noscript>
 
-  <script type="module" src="./assets/experience-v2.js?v=b98d47ddd92b"></script>
+  <script type="module" src="./assets/experience-v2.js?v=dd8eee9f882e"></script>
 </body>
 </html>
