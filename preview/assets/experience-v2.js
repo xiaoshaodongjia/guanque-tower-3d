@@ -265,13 +265,16 @@ class Soundscape {
 }
 
 // Routes follow the switchback stairs in build_interior.py, in metres, Y up.
+function interiorStairFoyer(level) {
+  return Math.min(8.4, level.depth / 2 - (level.index === 8 ? .12 : .45));
+}
 function interiorStairRoute(levels, from, to, cx = 10) {
   if (Math.abs(from - to) !== 1) throw new Error('Stair routes connect adjacent floors.');
   const lower = levels[Math.min(from, to)], upper = levels[Math.max(from, to)];
   const eye = 1.65, height = upper.z - lower.z;
   const flights = height <= 6.5 ? 2 : 4;
   const rise = height / flights, run = Math.ceil(rise / .18) * .26, front = -5.9;
-  const foyer = level => Math.min(8.4, level.depth / 2 - .45);
+  const foyer = interiorStairFoyer;
   const points = [[cx, lower.z + eye, foyer(lower)], [cx, lower.z + eye, 6.42], [cx - .85, lower.z + eye, 6.42]];
   for (let flight = 0; flight < flights; flight++) {
     const direction = flight % 2 === 0 ? 1 : -1;
@@ -288,7 +291,8 @@ function interiorStairRoute(levels, from, to, cx = 10) {
 
 function interiorWalkCanStand(level, x, z) {
   const radius = .28;
-  if (Math.abs(x) > level.width / 2 - .42 || Math.abs(z) > level.depth / 2 - .42) return false;
+  const frontLimit = level.depth / 2 - (level.index === 8 ? .10 : .42);
+  if (Math.abs(x) > level.width / 2 - .42 || z > frontLimit || z < -level.depth / 2 + .42) return false;
   const nearBox = (cx, cz, hx, hz) => Math.hypot(Math.max(0, Math.abs(x - cx) - hx), Math.max(0, Math.abs(z - cz) - hz)) < radius;
   const diameter = level.index <= 3 ? 1.2 : ({4:1.1,5:1,6:.9,7:.9,8:.9}[level.index]);
   const columns = [];
@@ -317,7 +321,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   const storyLevels = FLOOR_STORIES.filter(story => story.kind === 'story');
   const isStoryFloor = index => FLOOR_STORIES[index].kind === 'story';
   const keys = new Set(), held = new Map();
-  let active = false, floor = 3, lastStory = -1, nearStory = false;
+  let active = false, floor = 3, lastStory = -1;
   let yaw = 0, pitch = -.04, dragging = null, transition = null, saved = null;
   let walkingLastFrame = false;
   const direction = new THREE.Vector3(), nextPosition = new THREE.Vector3();
@@ -353,6 +357,10 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     const landing = new THREE.Mesh(new THREE.BoxGeometry(3.45*scale,.18*scale,1.12*scale),new THREE.MeshStandardMaterial({color:'#ddd6c3',roughness:.85}));
     landing.position.set(cx*scale,(levels[0].z-.09)*scale,6.42*scale); decor.add(landing);
   }
+  // Digital landing extension keeps the top-storey foyer connected around its columns.
+  const topLevel = levels.at(-1);
+  const topLanding = new THREE.Mesh(new THREE.BoxGeometry(topLevel.width*scale,.28*scale,.2*scale),new THREE.MeshStandardMaterial({color:'#c3aa76',roughness:.85}));
+  topLanding.position.set(0,(topLevel.z-.14)*scale,(topLevel.depth/2+.1)*scale); decor.add(topLanding);
   for (const level of levels) {
     const option = document.createElement('option'); option.value=String(level.index); option.textContent=level.label+' · '+FLOOR_STORIES[level.index].title;
     $('walk-storey').appendChild(option);
@@ -376,7 +384,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-recenter').disabled=!!transition;
     board.material.map=storyTextures[floor];
     board.position.set(3.4*scale,(level.z+1.95)*scale,0);
-    for (const {cx,portal} of portals) portal.position.set(cx*scale,level.z*scale,Math.min(8.4,level.depth/2-.45)*scale);
+    for (const {cx,portal} of portals) portal.position.set(cx*scale,level.z*scale,interiorStairFoyer(level)*scale);
     onFloor(floor);
   }
   function showStory() {
@@ -406,7 +414,6 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     floor=Math.max(0,index); updateFloor();
     $('walk-status').textContent='拖动画面环视 · W A S D 或方向键行走';
     setMode('入楼漫游 · '+levels[floor].label);
-    nearStory=false;
     if (lastStory!==floor) { lastStory=floor; if(isStoryFloor(floor))showStory(); }
   }
   function warp(to,{route=null}={}) {
@@ -475,7 +482,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     enter(index=3){
       if(active)return;
       saved={position:camera.position.clone(),target:controls.target.clone(),fov:camera.fov};
-      active=true;floor=index;lastStory=-1;nearStory=false;controls.enabled=false;
+      active=true;floor=index;lastStory=-1;controls.enabled=false;
       camera.fov=68;camera.updateProjectionMatrix();decor.visible=true;document.body.classList.add('walking');
       warp(index);
     },
@@ -510,7 +517,10 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
         const span=item.lengths[index]-item.lengths[index-1];
         camera.position.lerpVectors(item.points[index-1],item.points[index],span?((item.distance-item.lengths[index-1])/span):1);
         direction.subVectors(item.points[index],item.points[index-1]);
-        if(!dragging&&Math.hypot(direction.x,direction.z)>.001){const target=Math.atan2(direction.x,-direction.z);yaw+=Math.atan2(Math.sin(target-yaw),Math.cos(target-yaw))*(1-Math.exp(-seconds*7));pitch+=(-.1-pitch)*(1-Math.exp(-seconds*4));}
+        if(!dragging&&Math.hypot(direction.x,direction.z)>.001){
+          const target=item.distance>item.total-1.6*scale?(camera.position.x>0?-Math.PI/2:Math.PI/2):Math.atan2(direction.x,-direction.z);
+          yaw+=Math.atan2(Math.sin(target-yaw),Math.cos(target-yaw))*(1-Math.exp(-seconds*7));pitch+=(-.1-pitch)*(1-Math.exp(-seconds*4));
+        }
         orient();
         if(item.distance>=item.total)arrive();
       }else{
@@ -520,8 +530,6 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
         move(forward,right,seconds);orient();
         const moving=!!(forward||right);
         if(moving!==walkingLastFrame){$('walk-status').textContent=moving?levels[floor].label+' · 正在行走':'拖动画面环视 · W A S D 或方向键行走';walkingLastFrame=moving;}
-        const nearby=Math.hypot(camera.position.x/scale-3.4,camera.position.z/scale)<2.7;
-        if(isStoryFloor(floor)&&nearby&&!nearStory)showStory();nearStory=nearby;
       }
       light.position.copy(camera.position);light.position.y+=.4*scale;
     }
@@ -537,6 +545,15 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
   const panel = $('interior-panel');
   const selector = $('interior-storey');
   const plane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  // The photo-derived shell contains closed floor/decorative solids. In walking
+  // mode, remove their inner portions so the separate structural model defines
+  // the occupied space, including its stair openings. Facades stay outside this cut.
+  const walkPlanes = [[62,44],[35,24],[29,20],[26,16.1]].map(([width,depth]) => [
+    new THREE.Plane(new THREE.Vector3(1,0,0),-width/2*1.4),
+    new THREE.Plane(new THREE.Vector3(-1,0,0),-width/2*1.4),
+    new THREE.Plane(new THREE.Vector3(0,0,1),-depth/2*1.4),
+    new THREE.Plane(new THREE.Vector3(0,0,-1),-depth/2*1.4)
+  ]);
   const originals = new WeakMap();
   let root = null, task = null, generation = 0;
   let active = false, mode = 'section', selected = 'all', spread = 0, spreadTarget = 0;
@@ -565,17 +582,18 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
     exterior().traverse(obj => {
       if (!obj.isMesh) return;
       for (const material of Array.isArray(obj.material) ? obj.material : [obj.material]) {
-        if (!originals.has(material)) originals.set(material, { side: material.side, clippingPlanes: material.clippingPlanes, clipShadows: material.clipShadows });
-        callback(material, originals.get(material));
+        if (!originals.has(material)) originals.set(material, { side: material.side, clippingPlanes: material.clippingPlanes, clipShadows: material.clipShadows, clipIntersection: material.clipIntersection });
+        callback(material, originals.get(material), obj);
       }
     });
   }
   function refreshExterior() {
     exterior().visible = !active || walker.active || (mode === 'section' && selected === 'all' && spreadTarget === 0 && spread < .001);
-    exteriorMaterials((material, original) => {
+    exteriorMaterials((material, original, obj) => {
       const cut = active && !walker.active && mode === 'section';
-      material.clippingPlanes = cut ? [plane] : original.clippingPlanes;
-      material.clipShadows = cut ? true : original.clipShadows;
+      material.clippingPlanes = walker.active ? walkPlanes[obj.userData.tier ?? 0] : cut ? [plane] : original.clippingPlanes;
+      material.clipIntersection = walker.active ? true : cut ? false : original.clipIntersection;
+      material.clipShadows = cut || walker.active ? true : original.clipShadows;
       material.side = cut || walker.active ? THREE.DoubleSide : original.side;
       material.needsUpdate = true;
     });
