@@ -330,6 +330,10 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
     panel.hidden = !active;
     document.querySelector('.part-list').hidden = active;
     document.querySelector('.structure-controls').hidden = active;
+    document.querySelector('#view-explore .pane-note').textContent = active
+      ? '从台基到楼顶，查看柱、梁、楼板和两侧交通区。'
+      : '点选构件，或点击画面中的标记，靠近看一看。';
+    $('view-hint').textContent = active ? '拖拽查看骨架 · 选择楼层或移动剖切面' : '点击构件或标记，靠近读一座楼';
     button.setAttribute('aria-pressed', String(active));
     button.textContent = active ? '返回外观探索' : '打开九层内部结构';
     document.querySelectorAll('[data-interior-mode]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.interiorMode === mode)));
@@ -349,10 +353,18 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, exterior, 
       box.translate(delta.set(0, group.userData.index * 5 * (spreadTarget-spread) * 1.4, 0));
       bounds.union(box);
     }
+    if (mode === 'section' && selected === 'all' && spreadTarget === 0) {
+      // The roof and exterior podium extend beyond the interior's own bounds.
+      const shell = new THREE.Box3().setFromObject(exterior());
+      shell.max.z = Math.min(shell.max.z, plane.constant);
+      if (!shell.isEmpty()) bounds.union(shell);
+    }
     if (bounds.isEmpty()) return;
     const target = bounds.getCenter(new THREE.Vector3());
     const size = bounds.getSize(new THREE.Vector3());
-    const distance = Math.max(75, size.x * 1.45, size.y * 1.85, size.z * 1.7);
+    const distance = selected === 'all'
+      ? Math.max(110, size.x * 1.65, size.y * 2.35, size.z * 1.95)
+      : Math.max(75, size.x * 1.45, size.y * 1.85, size.z * 1.7);
     const offset = new THREE.Vector3(.55, selected === 'all' ? .38 : .92, 1).normalize().multiplyScalar(distance);
     const label = selected === 'all' ? '九层结构 · 示意剖视' : INTERIOR.storeys[Number(selected)].label + ' · 结构示意';
     flyTo(target.clone().add(offset), target, { duration: 2.7, label });
