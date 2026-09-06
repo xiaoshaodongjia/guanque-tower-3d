@@ -1763,6 +1763,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
       }
       document.querySelectorAll('[data-view]').forEach(button => {
         button.addEventListener('click', () => {
+          if (button.dataset.view === view) return;
           switchView(button.dataset.view);
           if (view === 'explore') focusOverview();
           if (view === 'history') openHistory(0);
