@@ -817,6 +817,43 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
   lakeMaterial.uniforms = THREE.UniformsUtils.clone(waterUniforms);
   // The small landscape lake has gentler ripples than the distant Yellow River.
   lakeMaterial.vertexShader = lakeMaterial.vertexShader.replace('* 0.07;', '* 0.016;').replace('* 0.035;', '* 0.008;');
+  // Filter small ripples at their pixel footprint and keep reflections broad and soft.
+  lakeMaterial.fragmentShader = `
+    uniform float uTime;
+    uniform float uDusk;
+    uniform vec3 uWaterColor;
+    uniform vec3 uHorizon;
+    uniform vec3 uSunDirection;
+    uniform vec3 uSunColor;
+    varying vec3 vWorldPosition;
+    #include <common>
+    #include <fog_pars_fragment>
+
+    void main() {
+      vec2 p = vWorldPosition.xz;
+      float phaseA = p.x * 0.055 + p.y * 0.075 + uTime * 0.18;
+      float phaseB = p.x * 0.035 - p.y * 0.065 - uTime * 0.14;
+      float filterA = 1.0 - smoothstep(0.35, 1.8, fwidth(phaseA));
+      float filterB = 1.0 - smoothstep(0.35, 1.8, fwidth(phaseB));
+      vec3 normal = normalize(vec3(
+        cos(phaseA) * 0.010 * filterA,
+        1.0,
+        cos(phaseB) * 0.012 * filterB
+      ));
+      vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+      vec3 halfDirection = normalize(viewDirection + normalize(uSunDirection));
+      float fresnel = pow(1.0 - max(dot(normal, viewDirection), 0.0), 3.0);
+      float reflection = pow(max(dot(normal, halfDirection), 0.0), 28.0);
+      float variation = sin(phaseA) * filterA * 0.004 + sin(phaseB) * filterB * 0.003;
+      vec3 color = mix(uWaterColor, uHorizon, fresnel * 0.23);
+      color *= 0.97 + variation;
+      color += uSunColor * reflection * mix(0.10, 0.13, uDusk);
+      gl_FragColor = vec4(color, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+      #include <fog_fragment>
+    }
+  `;
   const lakeDay = new THREE.Color('#527d68'), lakeDusk = new THREE.Color('#626e55');
   function status(state, message) {
     document.getElementById('stage').dataset.scenery = state;
@@ -1825,7 +1862,6 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       function switchView(next, { keepMotion = false } = {}) {
         if (!keepMotion) haltMotion();
         view = next;
-        if (next !== 'park') { camera.near = .35; camera.updateProjectionMatrix(); }
         document.querySelectorAll('[data-view]').forEach(button => {
           const selected = button.dataset.view === next;
           button.setAttribute('aria-selected', String(selected));
@@ -2423,11 +2459,10 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         fillLight.intensity = mix(.6, .45, lightAmount) + (view === 'explore' ? .8 : 0);
         sound.tick(lightAmount, camera.position.z < 0 ? .9 : tour?.index === 0 ? .7 : .1, view === 'explore');
         sky.position.copy(camera.position);
-        if (view === 'park' && !interiorExplorer.active) {
-          // Broad park views need more depth precision than an indoor eye point.
-          const near = clamp(camera.position.distanceTo(controls.target) / 35, .35, 25);
-          if (Math.abs(camera.near - near) > .02) { camera.near = near; camera.updateProjectionMatrix(); }
-        }
+        // Keep distant surfaces stable even when the same view is used for a postcard.
+        // Indoor exploration retains its close near plane for walking and sections.
+        const near = interiorExplorer.active ? .35 : clamp(camera.position.distanceTo(controls.target) / 35, .35, 25);
+        if (Math.abs(camera.near - near) > .02) { camera.near = near; camera.updateProjectionMatrix(); }
         renderer.render(scene, camera);
         updateHotspots();
         if (firstFrame) { firstFrame = false; loading.classList.add('ready'); }
