@@ -91,6 +91,7 @@ class Soundscape {
     this.assetURL = assetURL;
     this.notify = notify;
     const saved = readPreference('guanque-sound-v2', {});
+    this.musicTrack = saved.track === 'original' ? 'original' : 'fuguang';
     this.musicVolume = Number.isFinite(saved.music) ? Math.max(0, Math.min(1, saved.music)) : .4;
     this.ambientVolume = Number.isFinite(saved.ambient) ? Math.max(0, Math.min(1, saved.ambient)) : .25;
     this.narrationEnabled = saved.narration !== false;
@@ -103,10 +104,15 @@ class Soundscape {
     this.pendingVoice = null;
     this.voiceToken = 0;
     this.voicePaused = false;
-    this.backgrounded = false;
+    this.backgrounded = document.hidden;
     this.failedNotice = false;
+    this.playerNotice = false;
     this.button = document.getElementById('sound-toggle');
     this.label = document.getElementById('sound-label');
+    this.trackSelect = document.getElementById('music-track');
+    this.externalPlayer = document.getElementById('external-music-player');
+    this.externalPlay = document.getElementById('external-music-play');
+    this.externalReload = document.getElementById('external-music-reload');
     const music = document.getElementById('music-volume');
     const ambient = document.getElementById('ambient-volume');
     const narration = document.getElementById('narration-enabled');
@@ -121,13 +127,59 @@ class Soundscape {
     music.addEventListener('input', () => { this.musicVolume = Number(music.value) / 100; updateSliders(); this.persist(); });
     ambient.addEventListener('input', () => { this.ambientVolume = Number(ambient.value) / 100; updateSliders(); this.persist(); });
     narration.addEventListener('change', () => { this.narrationEnabled = narration.checked; if (!this.narrationEnabled) this.stopVoice(); this.persist(); });
+    this.trackSelect.addEventListener('change', () => this.setMusicTrack(this.trackSelect.value));
+    this.externalPlay.addEventListener('click', () => this.setEnabled(true, true));
+    this.externalReload.addEventListener('click', () => {
+      this.externalPlayer.removeAttribute('src');
+      this.setEnabled(true, true);
+    });
     this.button.addEventListener('click', () => this.setEnabled(!this.enabled, true));
     this.refresh();
   }
-  persist() { savePreference('guanque-sound-v2', { music: this.musicVolume, ambient: this.ambientVolume, narration: this.narrationEnabled, muted: this.userMuted }); }
+  persist() { savePreference('guanque-sound-v2', { track: this.musicTrack, music: this.musicVolume, ambient: this.ambientVolume, narration: this.narrationEnabled, muted: this.userMuted }); }
   refresh() {
     this.button.setAttribute('aria-pressed', String(this.enabled));
     this.label.textContent = this.enabled ? '声景已开启' : '开启声音';
+    this.trackSelect.value = this.musicTrack;
+    const external = this.musicTrack === 'fuguang';
+    document.getElementById('external-music-panel').hidden = !external;
+    document.getElementById('original-music-controls').hidden = external;
+    this.externalPlayer.hidden = !this.externalPlayer.hasAttribute('src');
+    this.externalPlay.hidden = this.enabled;
+    this.externalReload.hidden = !this.enabled;
+  }
+  setMusicTrack(track) {
+    if (!['fuguang', 'original'].includes(track) || track === this.musicTrack) return;
+    this.musicTrack = track;
+    // Clear the original track immediately before the external player starts.
+    if (track === 'fuguang') {
+      for (const key of ['day', 'dusk']) {
+        const loop = this.loops.get(key);
+        if (loop) this.setGain(loop, 0, 0);
+      }
+    }
+    this.syncExternalPlayer();
+    if (this.enabled) this.prepareLoops();
+    this.persist();
+    this.refresh();
+  }
+  syncExternalPlayer() {
+    const active = this.enabled && !this.backgrounded && this.musicTrack === 'fuguang';
+    if (active && !this.externalPlayer.hasAttribute('src')) {
+      // The official cross-origin player owns playback and volume. Never mix day/dusk under it.
+      this.externalPlayer.src = 'https://music.163.com/outchain/player?type=2&id=1394601255&auto=1&height=66';
+      if (!this.playerNotice) {
+        this.playerNotice = true;
+        if (document.getElementById('sound-settings').hidden) this.notify('《浮光》如未响起，可在右上角「声音设置」中点击播放器的播放键。');
+      }
+    } else if (!active) {
+      // Unload, rather than just hide, so mute/switch/background also stops the external audio.
+      this.externalPlayer.removeAttribute('src');
+    }
+  }
+  showSettings() {
+    document.getElementById('sound-settings').hidden = false;
+    document.getElementById('sound-settings-toggle').setAttribute('aria-expanded', 'true');
   }
   ensureFromGesture() { if (!this.userMuted) this.setEnabled(true); }
   setEnabled(enabled, explicit = false) {
@@ -150,10 +202,13 @@ class Soundscape {
       this.stopVoice();
       for (const loop of this.loops.values()) this.setGain(loop, 0, .18);
     }
+    if (this.enabled && explicit && this.musicTrack === 'fuguang') this.showSettings();
+    this.syncExternalPlayer();
     this.refresh();
   }
   failAudio() {
     this.enabled = false;
+    this.syncExternalPlayer();
     this.refresh();
     if (!this.failedNotice) { this.failedNotice = true; this.notify('声音暂未开启，可以再次点击右上角重试。'); }
   }
@@ -168,7 +223,8 @@ class Soundscape {
     return this.buffers.get(key);
   }
   prepareLoops() {
-    for (const key of ['day', 'dusk', 'river', 'wind']) {
+    const keys = this.musicTrack === 'original' ? ['day', 'dusk', 'river', 'wind'] : ['river', 'wind'];
+    for (const key of keys) {
       if (this.loops.has(key)) continue;
       const loop = { loading: true, gain: null, target: 0 };
       this.loops.set(key, loop);
@@ -188,7 +244,14 @@ class Soundscape {
     }
   }
   setGain(loop, value, time = .42) {
-    if (!loop.gain || Math.abs(loop.target - value) < .0005) return;
+    if (!loop.gain) return;
+    if (time === 0) {
+      loop.target = value;
+      loop.gain.gain.cancelScheduledValues(this.context.currentTime);
+      loop.gain.gain.setValueAtTime(value, this.context.currentTime);
+      return;
+    }
+    if (Math.abs(loop.target - value) < .0005) return;
     loop.target = value;
     loop.gain.gain.setTargetAtTime(value, this.context.currentTime, time);
   }
@@ -196,7 +259,7 @@ class Soundscape {
     if (!this.context) return;
     const on = this.enabled && !this.backgrounded ? 1 : 0;
     const duck = this.voice && !this.voicePaused ? .24 : 1;
-    const music = on * this.musicVolume * .92 * duck * (exploring ? .82 : 1);
+    const music = this.musicTrack === 'original' ? on * this.musicVolume * .92 * duck * (exploring ? .82 : 1) : 0;
     const ambient = on * this.ambientVolume * (this.voice && !this.voicePaused ? .55 : 1);
     for (const [key, loop] of this.loops) {
       const target = key === 'day' ? music * Math.cos(dusk * Math.PI / 2)
@@ -257,6 +320,8 @@ class Soundscape {
   }
   visibility(hidden) {
     this.backgrounded = hidden;
+    this.syncExternalPlayer();
+    this.refresh();
     if (!this.context) return;
     if (hidden) this.context.suspend().catch(() => {});
     else if (this.enabled) this.context.resume().then(() => {

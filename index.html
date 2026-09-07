@@ -8,7 +8,7 @@
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
   
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=4c97593c37ce">
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=a40d3ef70b46">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=9f505e58ea21" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -160,10 +160,21 @@
   </div>
   <aside id="sound-settings" class="sound-settings" aria-label="声音设置" hidden>
     <div class="section-heading"><span>山河声景</span><button class="text-button" id="close-sound-settings" aria-label="收起声音设置">×</button></div>
-    <label for="music-volume">配乐 <output id="music-volume-value">40%</output></label><input id="music-volume" type="range" min="0" max="100" value="40">
+    <label for="music-track">背景音乐</label>
+    <select id="music-track"><option value="fuguang">浮光（The History） · Jannik</option><option value="original">原配乐 · 山河五音</option></select>
+    <div id="external-music-panel">
+      <iframe id="external-music-player" title="浮光（The History）— Jannik · 网易云音乐播放器" width="330" height="86" allow="autoplay" hidden></iframe>
+      <button id="external-music-play" class="outline-button">播放《浮光》</button>
+      <div class="music-player-actions"><button id="external-music-reload" class="text-button" hidden>重新载入播放器</button><a href="https://music.163.com/song?id=1394601255" target="_blank" rel="noopener noreferrer">在网易云打开 ↗</a></div>
+      <p class="microcopy">点播放器可播放或暂停，音量随设备调整。<br>《浮光》需联网，听讲解时可先暂停音乐。</p>
+    </div>
+    <div id="original-music-controls" hidden>
+      <label for="music-volume">原配乐音量 <output id="music-volume-value">40%</output></label><input id="music-volume" type="range" min="0" max="100" value="40">
+      <p class="microcopy">原创五声音景，随白日与黄昏变换。<br>朗诵时原配乐会轻轻降低。</p>
+    </div>
     <label for="ambient-volume">风与水 <output id="ambient-volume-value">25%</output></label><input id="ambient-volume" type="range" min="0" max="100" value="25">
     <label class="check-row"><input type="checkbox" id="narration-enabled" checked>开启朗诵与构件讲解</label>
-    <p class="microcopy">原创五声音景 · 云扬合成男声<br>朗诵时配乐会轻轻降低。</p>
+    <p class="microcopy">朗诵与讲解 · 云扬合成男声</p>
   </aside>
 
   <div id="interior-legend" class="interior-legend" aria-live="polite" hidden><strong id="interior-legend-floor">九层结构示意</strong><span>平面与部分层高推定</span><div><i class="known-dot"></i>有标高依据 <i class="estimated-dot"></i>标高推定</div></div>
@@ -202,6 +213,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button></div>
   <noscript><div class="no-script">请启用 JavaScript，进入鹳雀楼数字化漫游。</div></noscript>
   
-  <script type="module" src="./assets/experience-v2.js?v=4c97593c37ce"></script>
+  <script type="module" src="./assets/experience-v2.js?v=a40d3ef70b46"></script>
 </body>
 </html>
