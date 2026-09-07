@@ -7,8 +7,8 @@
   <meta name="description" content="鹳雀凌云：沿黄河游览鹳雀楼，听声景、识斗拱、赏唐诗，收集六枚山河印章，留下自己的观景明信片。">
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
-  <base href="../">
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=7a7c59f1a8db">
+
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=68d79542f735">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=9f505e58ea21" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -29,6 +29,7 @@
 
     <nav class="view-tabs" role="tablist" aria-label="选择体验">
       <button id="tab-tour" role="tab" data-view="tour" aria-selected="true" aria-controls="view-tour">四境</button>
+      <button id="tab-park" role="tab" data-view="park" aria-selected="false" aria-controls="view-park" tabindex="-1">游园</button>
       <button id="tab-explore" role="tab" data-view="explore" aria-selected="false" aria-controls="view-explore" tabindex="-1">观筑</button>
       <button id="tab-poetry" role="tab" data-view="poetry" aria-selected="false" aria-controls="view-poetry" tabindex="-1">诗境</button>
       <button id="tab-history" role="tab" data-view="history" aria-selected="false" aria-controls="view-history" tabindex="-1">古今</button>
@@ -39,12 +40,26 @@
       <section id="view-tour" class="view-pane" role="tabpanel" aria-labelledby="tab-tour">
         <button class="primary-button" id="play-all"><span class="play-triangle" aria-hidden="true"></span>启程 · 连游四境<span class="button-tail">约 2 分钟</span></button>
         <p class="pane-note">从大河入境，到落日吟诗。初次启程开启声景。</p>
+        <button class="outline-button park-entry" id="open-park">游园 · 从入口走到楼前 ↗</button>
         <nav class="scene-nav" aria-label="选择巡航场景">
           <button class="scene-button" data-scene="0" aria-pressed="false"><span class="scene-number">壹</span><span><span class="scene-title">蒲津古渡，大河在望</span><span class="scene-description">望河 · 远景入境</span></span><span class="scene-check" aria-hidden="true"></span></button>
           <button class="scene-button" data-scene="1" aria-pressed="false"><span class="scene-number">贰</span><span><span class="scene-title">鹳雀雄楼，高台凌云</span><span class="scene-description">观楼 · 环楼一周</span></span><span class="scene-check" aria-hidden="true"></span></button>
           <button class="scene-button" data-scene="2" aria-pressed="false"><span class="scene-number">叁</span><span><span class="scene-title">层檐极目，凭栏望远</span><span class="scene-description">临高 · 沿楼外侧观景</span></span><span class="scene-check" aria-hidden="true"></span></button>
           <button class="scene-button" data-scene="3" aria-pressed="false"><span class="scene-number">肆</span><span><span class="scene-title">诗诵千年，白日依山尽</span><span class="scene-description">入诗 · 落日长河</span></span><span class="scene-check" aria-hidden="true"></span></button>
         </nav>
+      </section>
+
+      <section id="view-park" class="view-pane" role="tabpanel" aria-labelledby="tab-park" hidden>
+        <p class="pane-intro">穿园过湖，拾级登临。</p>
+        <p class="pane-note">沿实景中的入口、鹳影湖与主轴，走近这座楼。</p>
+        <button id="park-overview" class="primary-button">俯瞰景区全貌 <span class="button-tail">实景布局参考</span></button>
+        <p id="park-status" class="microcopy" role="status">正在铺展景区周边…</p><button id="park-retry" class="text-button" hidden>重新载入周边 ↗</button>
+        <nav id="park-stops" class="park-stops" aria-label="选择景区游览位置"></nav>
+        <div class="park-reading"><p id="park-stop-label" class="eyebrow">由入口望向鹳雀楼</p><p id="park-stop-note">入口、湖桥、圆形广场与高台，连成一段完整的登临。</p></div>
+        <button id="park-next" class="outline-button">从入口出发 →</button>
+        <button id="park-enter-building" class="text-button park-enter">进入楼内 · 接续楼层故事 ↗</button>
+        <label class="check-row park-visible"><input id="park-visible" type="checkbox" checked>显示景区周边</label>
+        <p class="microcopy">卫星图校正平面关系，航拍参考建筑形制。道路、湖岸和附属建筑尺寸为示意。</p>
       </section>
 
       <section id="view-explore" class="view-pane" role="tabpanel" aria-labelledby="tab-explore" hidden>
@@ -187,6 +202,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button></div>
   <noscript><div class="no-script">请启用 JavaScript，进入鹳雀楼数字化漫游。</div></noscript>
 
-  <script type="module" src="./assets/experience-v2.js?v=7a7c59f1a8db"></script>
+  <script type="module" src="./assets/experience-v2.js?v=68d79542f735"></script>
 </body>
 </html>
