@@ -145,7 +145,7 @@
       "position": [
         -210,
         170,
-        115
+        -10
       ],
       "target": [
         -214,
@@ -180,7 +180,7 @@
     "tower"
   ],
   "bytes": 4140924,
-  "gzipBytes": 1634003,
+  "gzipBytes": 1634020,
   "triangles": 106164,
   "meshes": 46,
   "trees": 406,
