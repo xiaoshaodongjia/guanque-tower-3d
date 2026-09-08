@@ -899,10 +899,16 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
       root.visible = active;
       for (const group of groups) group.visible = walker.active || selected === 'all' || group.userData.index === Number(selected);
       // Open the front of the stair cores as well as the outer building shell.
+      const floorOverlay = active && !walker.active && mode === 'section' && selected === 'all' && spreadTarget === 0;
       for (const { material, kind } of materialList) {
         material.clippingPlanes = active && !walker.active && mode === 'section' && kind === 'wall' ? [plane] : null;
         material.clipShadows = true;
         material.side = THREE.DoubleSide;
+        // The shell's terrace and room floors share elevations with these slabs.
+        // Prefer the structural surface at equal depth without changing its elevation.
+        material.polygonOffset = floorOverlay && kind.startsWith('floor-');
+        material.polygonOffsetFactor = -1;
+        material.polygonOffsetUnits = -4;
         material.needsUpdate = true;
       }
     }
