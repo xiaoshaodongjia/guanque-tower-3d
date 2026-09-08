@@ -2760,17 +2760,16 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           if (postcardURL) URL.revokeObjectURL(postcardURL);
           postcardURL = URL.createObjectURL(blob);
           $('postcard-preview').src = postcardURL;
+          $('download-postcard').href = postcardURL;
           $('postcard-status').textContent = '明信片包含当前视角、所选诗句与已收集的印章。';
           $('postcard-dialog').showModal();
         } catch (error) {
           console.error('Postcard:', error); notify('明信片暂未生成，请稍后再试一次。');
         } finally { capturing = false; $('capture-postcard').disabled = false; }
       });
-      $('download-postcard').addEventListener('click', () => {
-        if (!postcardURL) return;
-        const link = document.createElement('a'); link.href = postcardURL;
-        link.download = '鹳雀凌云_观景明信片.png'; document.body.appendChild(link); link.click(); link.remove();
-        $('postcard-status').textContent = '已准备下载。手机也可长按明信片图片保存。';
+      $('download-postcard').addEventListener('click', event => {
+        if (!postcardURL) { event.preventDefault(); return; }
+        $('postcard-status').textContent = '如未开始下载，可在打开的图片上保存；手机也可长按图片保存。';
       });
       $('close-postcard').addEventListener('click', () => $('postcard-dialog').close());
       $('retake-postcard').addEventListener('click', () => $('postcard-dialog').close());

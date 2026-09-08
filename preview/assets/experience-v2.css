@@ -30,6 +30,7 @@
 .microcopy { font-size: 11px; color: #99aa99; }
 .source-link { font-size: 12px; }
 .close-panel { min-width: 44px; min-height: 44px; }
+.dialog-actions a { text-decoration: none; font-size: 12px; }
 #stage canvas:focus-visible { outline: 2px solid var(--gold); outline-offset: -5px; }
 .scene-tools {
   position: fixed; z-index: 14; left: calc(var(--sidebar-edge, 300px) + 20px);
