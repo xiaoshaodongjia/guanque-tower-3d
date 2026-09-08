@@ -92,6 +92,7 @@ class Soundscape {
     this.notify = notify;
     const saved = readPreference('guanque-sound-v2', {});
     this.musicTrack = saved.track === 'original' ? 'original' : 'fuguang';
+    this.fuguangVolume = Number.isFinite(saved.fuguang) ? Math.max(0, Math.min(1, saved.fuguang)) : .2;
     this.musicVolume = Number.isFinite(saved.music) ? Math.max(0, Math.min(1, saved.music)) : .4;
     this.ambientVolume = Number.isFinite(saved.ambient) ? Math.max(0, Math.min(1, saved.ambient)) : .25;
     this.narrationEnabled = saved.narration !== false;
@@ -106,20 +107,29 @@ class Soundscape {
     this.voicePaused = false;
     this.backgrounded = document.hidden;
     this.failedNotice = false;
-    this.playerNotice = false;
+    this.musicPaused = false;
+    this.musicPending = false;
+    this.musicError = false;
+    this.musicToken = 0;
+    this.volumeUnsupported = false;
     this.button = document.getElementById('sound-toggle');
     this.label = document.getElementById('sound-label');
     this.trackSelect = document.getElementById('music-track');
     this.externalPlayer = document.getElementById('external-music-player');
     this.externalPlay = document.getElementById('external-music-play');
     this.externalReload = document.getElementById('external-music-reload');
+    this.musicStatus = document.getElementById('fuguang-status');
+    this.musicSeek = document.getElementById('fuguang-seek');
+    this.fuguangSlider = document.getElementById('fuguang-volume');
     const music = document.getElementById('music-volume');
     const ambient = document.getElementById('ambient-volume');
     const narration = document.getElementById('narration-enabled');
     music.value = Math.round(this.musicVolume * 100);
     ambient.value = Math.round(this.ambientVolume * 100);
     narration.checked = this.narrationEnabled;
+    this.fuguangSlider.value = Math.round(this.fuguangVolume * 100);
     const updateSliders = () => {
+      document.getElementById('fuguang-volume-value').textContent = this.volumeUnsupported ? '设备音量' : this.fuguangSlider.value + '%';
       document.getElementById('music-volume-value').textContent = music.value + '%';
       document.getElementById('ambient-volume-value').textContent = ambient.value + '%';
     };
@@ -127,16 +137,58 @@ class Soundscape {
     music.addEventListener('input', () => { this.musicVolume = Number(music.value) / 100; updateSliders(); this.persist(); });
     ambient.addEventListener('input', () => { this.ambientVolume = Number(ambient.value) / 100; updateSliders(); this.persist(); });
     narration.addEventListener('change', () => { this.narrationEnabled = narration.checked; if (!this.narrationEnabled) this.stopVoice(); this.persist(); });
+    this.fuguangSlider.addEventListener('input', () => {
+      this.fuguangVolume = Number(this.fuguangSlider.value) / 100;
+      this.applyFuguangVolume(); updateSliders(); this.persist();
+    });
     this.trackSelect.addEventListener('change', () => this.setMusicTrack(this.trackSelect.value));
-    this.externalPlay.addEventListener('click', () => this.setEnabled(true, true));
+    this.externalPlay.addEventListener('click', () => {
+      if (this.wantsFuguang() && (!this.externalPlayer.paused || this.musicPending)) {
+        this.musicPaused = true;
+        this.syncExternalPlayer(); this.refresh();
+      } else {
+        this.musicPaused = false;
+        this.setEnabled(true, true);
+      }
+    });
     this.externalReload.addEventListener('click', () => {
+      this.musicToken++;
+      this.musicPending = false;
+      this.musicError = false;
+      this.musicPaused = false;
+      this.externalPlayer.pause();
       this.externalPlayer.removeAttribute('src');
+      this.externalPlayer.load();
       this.setEnabled(true, true);
     });
+    this.externalPlayer.addEventListener('playing', () => {
+      if (!this.wantsFuguang()) { this.externalPlayer.pause(); return; }
+      this.musicError = false;
+      this.musicStatus.textContent = '正在播放 · 朗诵时音乐自动降低';
+      this.refresh();
+    });
+    this.externalPlayer.addEventListener('pause', () => {
+      if (!this.musicError) this.musicStatus.textContent = this.enabled ? '已暂停' : '声音已关闭';
+      this.refresh();
+    });
+    this.externalPlayer.addEventListener('waiting', () => {
+      if (this.wantsFuguang()) this.musicStatus.textContent = '正在缓冲音乐…';
+    });
+    this.externalPlayer.addEventListener('error', () => this.failMusic());
+    this.externalPlayer.addEventListener('loadedmetadata', () => this.refreshMusicTime());
+    this.externalPlayer.addEventListener('timeupdate', () => this.refreshMusicTime());
+    this.musicSeek.addEventListener('input', () => {
+      const duration = this.externalPlayer.duration;
+      if (Number.isFinite(duration) && duration > 0) {
+        this.externalPlayer.currentTime = Number(this.musicSeek.value) / 100 * duration;
+        this.refreshMusicTime();
+      }
+    });
     this.button.addEventListener('click', () => this.setEnabled(!this.enabled, true));
+    this.applyFuguangVolume();
     this.refresh();
   }
-  persist() { savePreference('guanque-sound-v2', { track: this.musicTrack, music: this.musicVolume, ambient: this.ambientVolume, narration: this.narrationEnabled, muted: this.userMuted }); }
+  persist() { savePreference('guanque-sound-v2', { track: this.musicTrack, fuguang: this.fuguangVolume, music: this.musicVolume, ambient: this.ambientVolume, narration: this.narrationEnabled, muted: this.userMuted }); }
   refresh() {
     this.button.setAttribute('aria-pressed', String(this.enabled));
     this.label.textContent = this.enabled ? '声景已开启' : '开启声音';
@@ -144,9 +196,9 @@ class Soundscape {
     const external = this.musicTrack === 'fuguang';
     document.getElementById('external-music-panel').hidden = !external;
     document.getElementById('original-music-controls').hidden = external;
-    this.externalPlayer.hidden = !this.externalPlayer.hasAttribute('src');
-    this.externalPlay.hidden = this.enabled;
-    this.externalReload.hidden = !this.enabled;
+    const playing = this.wantsFuguang() && (!this.externalPlayer.paused || this.musicPending);
+    this.externalPlay.textContent = playing ? '暂停《浮光》' : '播放《浮光》';
+    this.externalReload.hidden = !this.musicError;
   }
   setMusicTrack(track) {
     if (!['fuguang', 'original'].includes(track) || track === this.musicTrack) return;
@@ -163,19 +215,70 @@ class Soundscape {
     this.persist();
     this.refresh();
   }
+  wantsFuguang() { return this.enabled && !this.backgrounded && this.musicTrack === 'fuguang' && !this.musicPaused; }
   syncExternalPlayer() {
-    const active = this.enabled && !this.backgrounded && this.musicTrack === 'fuguang';
-    if (active && !this.externalPlayer.hasAttribute('src')) {
-      // The official cross-origin player owns playback and volume. Never mix day/dusk under it.
-      this.externalPlayer.src = 'https://music.163.com/outchain/player?type=2&id=1394601255&auto=1&height=66';
-      if (!this.playerNotice) {
-        this.playerNotice = true;
-        if (document.getElementById('sound-settings').hidden) this.notify('《浮光》如未响起，可在右上角「声音设置」中点击播放器的播放键。');
-      }
-    } else if (!active) {
-      // Unload, rather than just hide, so mute/switch/background also stops the external audio.
-      this.externalPlayer.removeAttribute('src');
+    if (!this.wantsFuguang()) {
+      this.musicToken++;
+      this.musicPending = false;
+      this.externalPlayer.pause();
+      return;
     }
+    this.applyFuguangVolume();
+    if (!this.externalPlayer.hasAttribute('src')) {
+      // Official public stream: HTMLAudioElement exposes volume without controlling a cross-origin iframe.
+      this.externalPlayer.src = 'https://music.163.com/song/media/outer/url?id=1394601255.mp3';
+    }
+    if (!this.externalPlayer.paused || this.musicPending) return;
+    const token = ++this.musicToken;
+    this.musicPending = true;
+    this.musicStatus.textContent = '正在载入《浮光》…';
+    this.externalPlayer.play().then(() => {
+      if (token !== this.musicToken) return;
+      this.musicPending = false;
+      this.refresh();
+    }).catch(error => {
+      if (token !== this.musicToken || !this.wantsFuguang()) return;
+      this.musicPending = false;
+      if (error.name === 'NotAllowedError') {
+        this.musicPaused = true;
+        this.musicStatus.textContent = '请点击播放按钮开始音乐。';
+        this.showSettings(); this.refresh();
+      } else if (error.name !== 'AbortError') this.failMusic();
+    });
+  }
+  failMusic() {
+    this.musicToken++;
+    this.musicPending = false;
+    this.musicError = true;
+    this.musicPaused = true;
+    this.externalPlayer.pause();
+    this.musicStatus.textContent = '音乐暂未载入，可重新载入或在网易云打开。';
+    if (this.enabled && !this.backgrounded && this.musicTrack === 'fuguang') this.showSettings();
+    this.refresh();
+  }
+  applyFuguangVolume(exploring = false) {
+    if (this.volumeUnsupported) return;
+    const duck = this.voice && !this.voicePaused ? .24 : 1;
+    const target = this.fuguangVolume * duck * (exploring ? .82 : 1);
+    try {
+      if (Math.abs(this.externalPlayer.volume - target) > .0005) this.externalPlayer.volume = target;
+      this.volumeUnsupported = Math.abs(this.externalPlayer.volume - target) > .01;
+    } catch { this.volumeUnsupported = true; }
+    if (this.volumeUnsupported) {
+      this.fuguangSlider.disabled = true;
+      document.getElementById('fuguang-volume-value').textContent = '设备音量';
+      document.getElementById('fuguang-device-volume').hidden = false;
+    }
+  }
+  refreshMusicTime() {
+    const format = seconds => Number.isFinite(seconds) ? Math.floor(seconds / 60).toString().padStart(2, '0') + ':' + Math.floor(seconds % 60).toString().padStart(2, '0') : '--:--';
+    const current = this.externalPlayer.currentTime;
+    const duration = this.externalPlayer.duration;
+    document.getElementById('fuguang-time').textContent = format(current) + ' / ' + format(duration);
+    const seekable = Number.isFinite(duration) && duration > 0;
+    this.musicSeek.disabled = !seekable;
+    this.musicSeek.value = seekable ? current / duration * 100 : 0;
+    this.musicSeek.setAttribute('aria-valuetext', format(current) + '，共 ' + format(duration));
   }
   showSettings() {
     document.getElementById('sound-settings').hidden = false;
@@ -256,6 +359,7 @@ class Soundscape {
     loop.gain.gain.setTargetAtTime(value, this.context.currentTime, time);
   }
   tick(dusk, nearRiver, exploring) {
+    this.applyFuguangVolume(exploring);
     if (!this.context) return;
     const on = this.enabled && !this.backgrounded ? 1 : 0;
     const duck = this.voice && !this.voicePaused ? .24 : 1;
