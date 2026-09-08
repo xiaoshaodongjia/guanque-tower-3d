@@ -2873,9 +2873,9 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         sound.tick(lightAmount, camera.position.z < 0 ? .9 : tour?.index === 0 ? .7 : .1, view === 'explore');
         sky.position.copy(camera.position);
         // Keep distant surfaces stable even when the same view is used for a postcard.
-        // Indoor exploration retains its close near plane for walking and sections.
-        const orbitDistance = interiorExplorer.active ? 0 : camera.position.distanceTo(controls.target);
-        const near = interiorExplorer.active ? .35 : clamp(orbitDistance / 35, .35, 75);
+        // Sections orbit at a distance too; only first-person walking needs the close near plane.
+        const orbitDistance = interiorExplorer.walking ? 0 : camera.position.distanceTo(controls.target);
+        const near = interiorExplorer.walking ? .35 : clamp(orbitDistance / 35, .35, 75);
         if (Math.abs(camera.near - near) > .02) { camera.near = near; camera.updateProjectionMatrix(); }
         scene.fog.density = mix(.00030, .00036, lightAmount) * Math.min(1, 1000 / Math.max(1, orbitDistance));
         renderer.render(scene, camera);
