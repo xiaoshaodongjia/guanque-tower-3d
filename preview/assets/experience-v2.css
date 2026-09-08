@@ -167,3 +167,16 @@
   .reading-facts span { display: inline; margin-left: 12px; }
   .reading-facts strong { display: inline; }
 }
+
+@media (pointer: coarse) {
+  .mobile-tip { display: inline; }
+  .desktop-tip { display: none; }
+}
+
+@media (min-width: 721px) and (max-height: 520px) {
+  .walking .brand, .walking .brand-caption, .walking .view-tabs,
+  .walking .tour-info, .walking .sidebar-footer, .walking .walk-scope { display: none; }
+  .walking .sidebar { padding-top: 18px; }
+  .walking .walk-panel strong { font-size: 18px; }
+  .walking .interior-label { margin-top: 10px; }
+}

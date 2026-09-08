@@ -174,7 +174,7 @@ const visitorExperience = (() => {
 })();
 
 // Fit all corners inside the unobscured part of the canvas, including narrow phones.
-function fitVisitorBounds(THREE, bounds, direction, camera, rect, padding = .91) {
+function fitVisitorBounds(THREE, bounds, direction, camera, rect, padding = .91, boxes = [bounds]) {
   const target = bounds.getCenter(new THREE.Vector3());
   const outward = direction.clone().normalize();
   const right = new THREE.Vector3().crossVectors(camera.up, outward).normalize();
@@ -183,8 +183,9 @@ function fitVisitorBounds(THREE, bounds, direction, camera, rect, padding = .91)
   const fitX = Math.max(.001, tangent * camera.aspect * (rect.right - rect.left) / rect.width * padding);
   const fitY = Math.max(.001, tangent * (rect.bottom - rect.top) / rect.height * padding);
   let distance = 40;
-  for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
-    const corner = new THREE.Vector3(x, y, z).sub(target);
+  const corner = new THREE.Vector3();
+  for (const box of boxes) for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+    corner.set(x, y, z).sub(target);
     distance = Math.max(distance, corner.dot(outward) + Math.abs(corner.dot(right)) / fitX,
       corner.dot(outward) + Math.abs(corner.dot(up)) / fitY);
   }
@@ -689,7 +690,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-story').hidden=true; sound.stopVoice(); clearInput();
     if(restoreFocus&&active)canvas.focus({preventScroll:true});
   }
-  const moveHint=()=>window.innerWidth<=720?'拖动画面环视 · 按住方向按钮行走':'拖动画面环视 · W A S D 或方向键行走';
+  const moveHint=()=>window.innerWidth<=720||matchMedia('(pointer: coarse)').matches?'拖动画面环视 · 按住方向按钮行走':'拖动画面环视 · W A S D 或方向键行走';
   function arrive() {
     transition=null; markers.visible=true; $('walk-fade').style.opacity='0';
     const foot=camera.position.y/scale-eye;
@@ -768,6 +769,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   $('exit-walk').addEventListener('click',onExit);
   return {
     get active(){return active;},get floor(){return floor;},
+    suspendInput:clearInput,
     enter(index=3){
       if(active)return;
       saved={position:camera.position.clone(),target:controls.target.clone(),fov:camera.fov};
@@ -1085,6 +1087,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
   }));
   return {
     get active() { return active; }, get walking() { return walker.active; }, exit, refreshExterior, layout, reframe: focus,
+    suspendInput: walker.suspendInput,
     tick(seconds) {
       walker.tick(seconds);
       if (!active || !root || Math.abs(spread-spreadTarget) < .001) return;
@@ -1961,6 +1964,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       const layerOffsets = [0, 9, 26, 44];
       const layerGroups = [];
       const modelMeshes = [];
+      const exteriorBoxes = [];
       let interiorExplorer = null;
       const pointer = new THREE.Vector2();
       const raycaster = new THREE.Raycaster();
@@ -1984,6 +1988,12 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           }
         });
         model.scene.updateMatrixWorld(true);
+        exteriorBoxes.length = 0;
+        for (const mesh of modelMeshes) {
+          const box = new THREE.Box3().setFromObject(mesh);
+          box.translate(V(0, -(layerOffsets[mesh.userData.tier] || 0) * explosion * 1.4, 0));
+          exteriorBoxes.push(box);
+        }
         renderer.shadowMap.needsUpdate = true;
         interiorExplorer?.refreshExterior();
       }
@@ -2326,7 +2336,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           const angle = Math.PI * 2 * t;
           position.set(Math.sin(angle)*184, 82 + Math.sin(Math.PI*t)*9, Math.cos(angle)*184);
           target.set(0,50,0);
-          const frame = fitVisitorBounds(THREE, parkTowerBounds, position.clone().sub(target), camera, parkViewingRect());
+          const frame = fitVisitorBounds(THREE, parkTowerBounds, position.clone().sub(target), camera, parkViewingRect(), .94, exteriorBoxes);
           position.copy(frame.position); target.copy(frame.target);
         } else if (index === 2) {
           platformPath.getPointAt(t, position);
@@ -2344,8 +2354,18 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         $('next-scene').disabled = tour.index === 3;
         $('tour-counter').textContent = `${tour.index + 1} / 4`;
         const name = ['一','二','三','四'][tour.index];
-        setMode(`${tour.paused ? tour.interrupted ? '已接管' : '已暂停' : tour.continuous ? '连游中' : '巡航中'} · 第${name}境`, !tour.paused);
-        $('tour-tip').textContent = tour.paused ? '点击继续，从当前视角平滑接回导览。' : '拖拽或缩放可随时接管，随后可继续。';
+        setMode(`${tour.paused ? tour.interrupted ? '已接管' : '已暂停' : visitorExperience.reducedMotion ? '静览中' : tour.continuous ? '连游中' : '巡航中'} · 第${name}境`, !tour.paused);
+        $('tour-tip').textContent = tour.paused
+          ? visitorExperience.reducedMotion ? '点击继续，回到本境的固定视角。' : '点击继续，从当前视角平滑接回导览。'
+          : visitorExperience.reducedMotion ? '固定视角欣赏山河，也可手动转动或缩放。' : '拖拽或缩放可随时接管，随后可继续。';
+      }
+      function tourCaption(index) {
+        return visitorExperience.reducedMotion ? [
+          '从黄河东岸，远望楼阁与山河。',
+          '静看楼阁，读懂高台、层檐与柱列的节奏。',
+          '来到高处，让视线越过层檐。',
+          '静赏落日长河，让四句唐诗回到风景里。'
+        ][index] : EXPERIENCE.scenes[index].caption;
       }
       function startTour(index, { continuous = false, internal = false } = {}) {
         exteriorOverviewFramed = false;
@@ -2366,7 +2386,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         });
         setTime(index === 3);
         showPoem(index === 3);
-        showCaption(`山河四境 · ${['壹','贰','叁','肆'][index]}`, info.caption);
+        showCaption(`山河四境 · ${['壹','贰','叁','肆'][index]}`, tourCaption(index));
         sound.speak('scene-' + index);
         $('play-all').textContent = continuous ? '重新启程 · 连游四境' : '从头连游四境';
         updatePlayer();
@@ -2530,15 +2550,19 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
 
       function focusVisibleLayers({ duration = 2.4, label } = {}) {
         const bounds = new THREE.Box3();
+        const boxes = [];
         model.scene.updateMatrixWorld(true);
         for (const group of layerGroups) {
           if (!group.visible) continue;
-          const box = new THREE.Box3().setFromObject(group);
           const futureDelta = layerOffsets[group.userData.tier] * explosionTarget * 1.4 - group.position.y * 1.4;
-          box.translate(V(0, futureDelta, 0)); bounds.union(box);
+          group.traverse(mesh => {
+            if (!mesh.isMesh) return;
+            const box = new THREE.Box3().setFromObject(mesh);
+            box.translate(V(0, futureDelta, 0)); bounds.union(box); boxes.push(box);
+          });
         }
         if (bounds.isEmpty()) return;
-        const frame = fitVisitorBounds(THREE, bounds, V(.58, .39, .85), camera, parkViewingRect());
+        const frame = fitVisitorBounds(THREE, bounds, V(.58, .39, .85), camera, parkViewingRect(), .94, boxes);
         flyTo(frame.position, frame.target, { duration, label: label || (tierFilter === 'all' ? '楼阁结构 · 全楼' : '楼阁结构 · ' + ['台基与外阶','楼身一至三层','楼身四至五层','楼身六层与屋顶'][Number(tierFilter)]) });
         exteriorOverviewFramed = true;
       }
@@ -2754,6 +2778,11 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
 
       function resize() {
         const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
+        const touchInput = width <= 720 || matchMedia('(pointer: coarse)').matches;
+        const exteriorHint = touchInput ? '单指转动 · 双指缩放' : '拖拽转动视角 · 滚轮缩放';
+        if (!tour) $('tour-tip').textContent = exteriorHint;
+        if (!interiorExplorer?.active) $('view-hint').textContent = view === 'explore' ? '点击构件或标记，靠近读一座楼' : exteriorHint;
+        renderer.domElement.setAttribute('aria-label', interiorExplorer?.walking ? '鹳雀楼楼内场景，拖动环视，使用方向按钮行走' : '鹳雀楼三维场景，' + exteriorHint);
         refreshLayoutBounds();
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.25 : 1.6, Math.sqrt(2800000 / (width * height))));
         renderer.setSize(width, height); camera.aspect = width / height;
@@ -2779,7 +2808,6 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       });
       sidebarObserver.observe(document.querySelector('.sidebar'));
       resize();
-      focusOverview({ duration: 0 });
       visitorExperience.connect({
         onTour: () => startTour(0, { continuous: true }),
         onHome: () => {
@@ -2788,15 +2816,27 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           renderer.domElement.focus({ preventScroll: true });
         },
         onPanelChange: reframeLayout,
-        onMotionChange: () => clearControlMomentum(),
+        onMotionChange: () => {
+          clearControlMomentum();
+          const descriptions = visitorExperience.reducedMotion
+            ? ['望河 · 静观大河', '观楼 · 静赏层檐', '临高 · 固定视角观景', '入诗 · 落日长河']
+            : ['望河 · 远景入境', '观楼 · 环楼一周', '临高 · 沿楼外侧观景', '入诗 · 落日长河'];
+          sceneButtons.forEach((button, index) => { button.querySelector('.scene-description').textContent = descriptions[index]; });
+          if (tour) {
+            updatePlayer();
+            if (tour.index !== 3 || tour.elapsed < 7.1) showCaption(`山河四境 · ${['壹','贰','叁','肆'][tour.index]}`, tourCaption(tour.index));
+          }
+        },
         onCoverChange: covered => {
           if (covered) {
+            interiorExplorer.suspendInput();
             if (tour) pauseTour();
             else if (flight || poetrySequence) interruptMotion();
           }
           sound.visibility(covered || document.hidden);
         }
       });
+      focusOverview({ duration: 0 });
       let previousTime = performance.now();
       let waterTime = 0;
       let firstFrame = true;
