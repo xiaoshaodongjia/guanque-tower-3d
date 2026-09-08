@@ -85,6 +85,113 @@ class ExplorationJournal {
   award(id) { if (this.stamps.has(id)) return false; this.stamps.add(id); this.save(); return true; }
 }
 
+// Visitor preferences and the reading alternative are available before WebGL starts.
+const visitorExperience = (() => {
+  const $ = id => document.getElementById(id);
+  const key = 'guanque-visitor-v1';
+  const preferences = readPreference(key, {});
+  const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const dialog = $('visitor-guide');
+  const priorJourney = readPreference('guanque-exploration-v2', {});
+  const returning = ['scenes', 'parts', 'poems', 'stamps'].some(name => Array.isArray(priorJourney[name]) && priorJourney[name].length);
+  let hooks = {}, ready = false, compact = false, wasCovered = false;
+  const reduced = () => typeof preferences.reducedMotion === 'boolean' ? preferences.reducedMotion : systemMotion.matches;
+  const covered = () => dialog.open || location.hash === '#reading-guide';
+  const remember = () => { preferences.introduced = true; savePreference(key, preferences); };
+
+  function updateMotion() {
+    document.documentElement.classList.toggle('reduced-motion', reduced());
+    $('visitor-reduced-motion').checked = reduced();
+    $('visitor-system-motion').hidden = typeof preferences.reducedMotion !== 'boolean';
+    hooks.onMotionChange?.(reduced());
+  }
+  function updateCover() {
+    document.body.classList.toggle('reading-mode', location.hash === '#reading-guide');
+    document.body.classList.toggle('visitor-guide-open', dialog.open);
+    const next = covered();
+    if (next !== wasCovered) { wasCovered = next; hooks.onCoverChange?.(next); }
+    if (location.hash === '#reading-guide') $('reading-guide').focus({ preventScroll: true });
+  }
+  function setCompact(value) {
+    compact = !!value;
+    document.body.classList.toggle('sidebar-compact', compact);
+    $('panel-toggle').textContent = compact ? '展开面板' : '收起面板';
+    $('panel-toggle').setAttribute('aria-expanded', String(!compact));
+    hooks.onPanelChange?.();
+  }
+  function show(first = false) {
+    if (!ready || dialog.open) return;
+    $('visitor-eyebrow').textContent = first ? '初次登临 · 山西永济' : '鹳雀凌云 · 游览帮助';
+    $('visitor-title').textContent = first ? '从这一楼，走进山河' : '按自己的节奏游览';
+    dialog.showModal(); updateCover();
+  }
+  function close() { remember(); dialog.close(); }
+  $('visitor-help').addEventListener('click', () => show());
+  $('close-visitor-guide').addEventListener('click', close);
+  dialog.addEventListener('close', () => { remember(); updateCover(); });
+  $('visitor-tour').addEventListener('click', () => {
+    close();
+    if (window.innerWidth <= 720) setCompact(true);
+    hooks.onTour?.();
+  });
+  $('visitor-explore').addEventListener('click', () => {
+    close();
+    if (window.innerWidth <= 720) setCompact(true);
+    hooks.onHome?.();
+  });
+  $('home-view').addEventListener('click', () => hooks.onHome?.());
+  $('panel-toggle').addEventListener('click', () => setCompact(!compact));
+  document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => setCompact(false)));
+  $('visitor-reduced-motion').addEventListener('change', event => {
+    preferences.reducedMotion = event.target.checked;
+    savePreference(key, preferences); updateMotion();
+  });
+  $('visitor-system-motion').addEventListener('click', () => {
+    delete preferences.reducedMotion;
+    savePreference(key, preferences); updateMotion();
+  });
+  systemMotion.addEventListener('change', updateMotion);
+  document.querySelectorAll('a[href="#reading-guide"]').forEach(link => link.addEventListener('click', () => {
+    if (dialog.open) close();
+  }));
+  window.addEventListener('hashchange', updateCover);
+  updateMotion(); updateCover();
+  return {
+    get reducedMotion() { return reduced(); },
+    get covered() { return covered(); },
+    expandPanel() { setCompact(false); },
+    connect(callbacks) {
+      hooks = callbacks;
+      updateMotion();
+      if (covered()) hooks.onCoverChange?.(true);
+    },
+    ready() {
+      ready = true;
+      for (const id of ['home-view', 'visitor-help', 'panel-toggle']) $(id).disabled = false;
+      if (!preferences.introduced && !returning && !covered()) show(true);
+    }
+  };
+})();
+
+// Fit all corners inside the unobscured part of the canvas, including narrow phones.
+function fitVisitorBounds(THREE, bounds, direction, camera, rect, padding = .91, boxes = [bounds]) {
+  const target = bounds.getCenter(new THREE.Vector3());
+  const outward = direction.clone().normalize();
+  const right = new THREE.Vector3().crossVectors(camera.up, outward).normalize();
+  const up = new THREE.Vector3().crossVectors(outward, right).normalize();
+  const tangent = Math.tan(THREE.MathUtils.degToRad(camera.getEffectiveFOV()) / 2);
+  const fitX = Math.max(.001, tangent * camera.aspect * (rect.right - rect.left) / rect.width * padding);
+  const fitY = Math.max(.001, tangent * (rect.bottom - rect.top) / rect.height * padding);
+  let distance = 40;
+  const corner = new THREE.Vector3();
+  for (const box of boxes) for (const x of [box.min.x, box.max.x]) for (const y of [box.min.y, box.max.y]) for (const z of [box.min.z, box.max.z]) {
+    corner.set(x, y, z).sub(target);
+    distance = Math.max(distance, corner.dot(outward) + Math.abs(corner.dot(right)) / fitX,
+      corner.dot(outward) + Math.abs(corner.dot(up)) / fitY);
+  }
+  return { position: target.clone().addScaledVector(outward, distance), target, distance };
+}
+
 // Audio starts only after a user gesture. One clock and request token prevent stale narration.
 class Soundscape {
   constructor(assetURL, notify) {
@@ -559,6 +666,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   }
   function showStory() {
     if (!active || transition) return;
+    clearInput();
     const story=FLOOR_STORIES[floor], level=levels[floor];
     if(isStoryFloor(floor)){visited.add(level.id);savePreference('guanque-floor-stories-v1',{floors:[...visited]});}
     const label=isStoryFloor(floor)?'楼层故事':'台基结构说明';
@@ -573,22 +681,31 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-story-scope').textContent=isStoryFloor(floor)?'六层故事为数字导览主题编排，不代表真实展厅用途。':'台基三层展示结构关系；平面与部分标高仍待完整 CAD 核对。';
     $('walk-read-story').hidden=!story.audio;
     $('walk-story').hidden=false;
+    document.querySelector('.walk-story-reading').scrollTop=0;
+    $('walk-story-title').focus({preventScroll:true});
     $('walk-progress').textContent=`故事足迹 ${visited.size} / ${storyLevels.length}`;
     if (story.audio) sound.speak(story.audio);
   }
-  function closeStory() { $('walk-story').hidden=true; sound.stopVoice(); }
+  function closeStory(restoreFocus=false) {
+    $('walk-story').hidden=true; sound.stopVoice(); clearInput();
+    if(restoreFocus&&active)canvas.focus({preventScroll:true});
+  }
+  const moveHint=()=>window.innerWidth<=720||matchMedia('(pointer: coarse)').matches?'拖动画面环视 · 按住方向按钮行走':'拖动画面环视 · W A S D 或方向键行走';
   function arrive() {
     transition=null; markers.visible=true; $('walk-fade').style.opacity='0';
     const foot=camera.position.y/scale-eye;
     const index=levels.findLastIndex(level=>foot>=level.z-.04);
     floor=Math.max(0,index); updateFloor();
-    $('walk-status').textContent='拖动画面环视 · W A S D 或方向键行走';
+    $('walk-status').textContent=moveHint();
     setMode('入楼漫游 · '+levels[floor].label);
     if (lastStory!==floor) { lastStory=floor; if(isStoryFloor(floor))showStory(); }
   }
   function warp(to,{route=null}={}) {
     if (!active || transition) return;
     clearInput(); closeStory(); markers.visible=false;
+    if(visitorExperience.reducedMotion){
+      camera.position.copy(spawn(to));yaw=0;pitch=-.04;orient();arrive();return;
+    }
     transition={kind:'fade',age:0,moved:false,to,route};
     $('walk-status').textContent=route?'前往楼梯，随后沿梯段登临…':'正在进入'+levels[to].label+'…';
     updateFloor();
@@ -600,7 +717,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     warp(to,{route:interiorStairRoute(levels,floor,to,cx).map(point)});
   }
   function move(forward,right,seconds) {
-    if (!active || transition || (!forward&&!right)) return;
+    if (!active || transition || visitorExperience.covered || !$('walk-story').hidden || document.querySelector('dialog[open]') || (!forward&&!right)) return;
     const magnitude=Math.max(1,Math.hypot(forward,right));
     const distance=speed*seconds/magnitude;
     let x=camera.position.x/scale,z=camera.position.z/scale;
@@ -613,8 +730,9 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   const movement={KeyW:[1,0],ArrowUp:[1,0],KeyS:[-1,0],ArrowDown:[-1,0],KeyA:[0,-1],ArrowLeft:[0,-1],KeyD:[0,1],ArrowRight:[0,1]};
   window.addEventListener('keydown',event=>{
     if(!active)return;
-    if(event.code==='Escape'){event.preventDefault();event.stopImmediatePropagation();onExit();return;}
-    if(event.target.closest?.('input,select,textarea,[contenteditable="true"]'))return;
+    if(event.defaultPrevented||visitorExperience.covered||document.querySelector('dialog[open]'))return;
+    if(event.code==='Escape'){event.preventDefault();event.stopImmediatePropagation();if(!$('walk-story').hidden)closeStory(true);else onExit();return;}
+    if(!$('walk-story').hidden||event.target.closest?.('button,a,input,select,textarea,[role="tab"],[contenteditable="true"]'))return;
     if(movement[event.code]){event.preventDefault();keys.add(event.code);if(!event.repeat)move(...movement[event.code],.09);}
     if(!event.repeat&&event.code==='KeyE'){event.preventDefault();changeFloor(1);}
     if(!event.repeat&&event.code==='KeyQ'){event.preventDefault();changeFloor(-1);}
@@ -624,6 +742,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInput();});
   canvas.addEventListener('pointerdown',event=>{
     if(!active||event.button!==0)return;
+    if(!$('walk-story').hidden)closeStory();
     dragging={id:event.pointerId,x:event.clientX,y:event.clientY};canvas.setPointerCapture(event.pointerId);
   });
   canvas.addEventListener('pointermove',event=>{
@@ -644,11 +763,13 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   $('walk-storey').addEventListener('change',event=>warp(Number(event.target.value)));
   $('walk-recenter').addEventListener('click',()=>{lastStory=-1;warp(floor);});
   $('walk-story-again').addEventListener('click',showStory);
-  $('walk-close-story').addEventListener('click',closeStory);
+  $('walk-close-story').addEventListener('click',()=>closeStory(true));
+  $('walk-continue').addEventListener('click',()=>closeStory(true));
   $('walk-read-story').addEventListener('click',()=>{const key=FLOOR_STORIES[floor].audio;if(key){sound.setEnabled(true,true);sound.speak(key);}});
   $('exit-walk').addEventListener('click',onExit);
   return {
     get active(){return active;},get floor(){return floor;},
+    suspendInput:clearInput,
     enter(index=3){
       if(active)return;
       saved={position:camera.position.clone(),target:controls.target.clone(),fov:camera.fov};
@@ -670,6 +791,10 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     },
     tick(seconds){
       if(!active)return;
+      if(visitorExperience.covered||document.querySelector('dialog[open]')){clearInput();return;}
+      if(transition&&visitorExperience.reducedMotion){
+        camera.position.copy(spawn(transition.to));yaw=0;pitch=-.04;orient();arrive();
+      }
       if(transition?.kind==='fade'){
         const item=transition;item.age+=seconds;
         $('walk-fade').style.opacity=String(Math.sin(Math.min(1,item.age/.7)*Math.PI));
@@ -699,7 +824,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
         for(const vector of held.values()){forward+=vector[0];right+=vector[1];}
         move(forward,right,seconds);orient();
         const moving=!!(forward||right);
-        if(moving!==walkingLastFrame){$('walk-status').textContent=moving?levels[floor].label+' · 正在行走':'拖动画面环视 · W A S D 或方向键行走';walkingLastFrame=moving;}
+        if(moving!==walkingLastFrame){$('walk-status').textContent=moving?levels[floor].label+' · 正在行走':moveHint();walkingLastFrame=moving;}
       }
       light.position.copy(camera.position);light.position.y+=.4*scale;
     }
@@ -810,7 +935,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
     const phone = width <= 720;
     const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
     const controls = document.querySelector('.top-controls').getBoundingClientRect();
-    const bottom = phone ? sidebar.top - 12 : height - 64;
+    const bottom = phone ? Math.min(sidebar.top - 12, $('scene-tools').getBoundingClientRect().top - 10) : height - 76;
     const top = Math.min(bottom - 96, (phone ? $('interior-legend').getBoundingClientRect().bottom : controls.bottom) + 14);
     return { width, height, left: phone ? 16 : sidebar.right + 24, right: width - 16, top, bottom };
   }
@@ -962,10 +1087,11 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
   }));
   return {
     get active() { return active; }, get walking() { return walker.active; }, exit, refreshExterior, layout, reframe: focus,
+    suspendInput: walker.suspendInput,
     tick(seconds) {
       walker.tick(seconds);
       if (!active || !root || Math.abs(spread-spreadTarget) < .001) return;
-      spread += (spreadTarget-spread)*(1-Math.exp(-seconds*4));
+      spread += (spreadTarget-spread)*(visitorExperience.reducedMotion?1:1-Math.exp(-seconds*4));
       if (Math.abs(spread-spreadTarget)<.001) spread=spreadTarget;
       groups.forEach(group => { group.position.y=group.userData.index*5*spread; });
       root.updateMatrixWorld(true);
@@ -1825,6 +1951,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       }
       const sound = new Soundscape(assetURL, notify);
       let view = 'tour';
+      let exteriorOverviewFramed = true;
       let tour = null;
       let flight = null;
       let poetrySequence = null;
@@ -1837,6 +1964,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       const layerOffsets = [0, 9, 26, 44];
       const layerGroups = [];
       const modelMeshes = [];
+      const exteriorBoxes = [];
       let interiorExplorer = null;
       const pointer = new THREE.Vector2();
       const raycaster = new THREE.Raycaster();
@@ -1860,6 +1988,12 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           }
         });
         model.scene.updateMatrixWorld(true);
+        exteriorBoxes.length = 0;
+        for (const mesh of modelMeshes) {
+          const box = new THREE.Box3().setFromObject(mesh);
+          box.translate(V(0, -(layerOffsets[mesh.userData.tier] || 0) * explosion * 1.4, 0));
+          exteriorBoxes.push(box);
+        }
         renderer.shadowMap.needsUpdate = true;
         interiorExplorer?.refreshExterior();
       }
@@ -1976,7 +2110,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       function clearControlMomentum() {
         controls.enableDamping = false;
         controls.update();
-        controls.enableDamping = true;
+        controls.enableDamping = !visitorExperience.reducedMotion;
       }
       function resetStructure() {
         interiorExplorer?.exit();
@@ -2042,7 +2176,8 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         showPoem(next === 'poetry');
         if (next !== 'explore') { resetStructure(); highlightPart(null); }
         $('hotspots').hidden = next !== 'explore';
-        $('view-hint').textContent = next === 'explore' ? '点击构件或标记，靠近读一座楼' : '拖拽转动视角 · 滚轮缩放';
+        $('view-hint').textContent = next === 'explore' ? '点击构件或标记，靠近读一座楼'
+          : window.innerWidth <= 720 ? '单指转动 · 双指缩放' : '拖拽转动视角 · 滚轮缩放';
         if (!keepMotion) setMode(viewNames[next]);
         requestAnimationFrame(resize);
       }
@@ -2050,6 +2185,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         button.addEventListener('click', () => {
           if (button.dataset.view === view) return;
           switchView(button.dataset.view);
+          if (view === 'tour') focusOverview();
           if (view === 'explore') focusOverview();
           if (view === 'park') selectParkStop('overview');
           if (view === 'history') openHistory(0);
@@ -2077,10 +2213,12 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       }
       function makeBridge(position, target, duration) {
         clearControlMomentum(); controls.enabled = false;
+        if (visitorExperience.reducedMotion) duration = 0;
         return { age: 0, duration, from: camera.position.clone(), fromTarget: controls.target.clone(),
           to: position.clone(), toTarget: target.clone(), lift: bridgeLift(camera.position, position) };
       }
       function updateBridge(bridge, delta) {
+        if (visitorExperience.reducedMotion) bridge.duration = 0;
         bridge.age = Math.min(bridge.duration, bridge.age + delta);
         const t = smooth(bridge.duration > 0 ? bridge.age / bridge.duration : 1);
         camera.position.lerpVectors(bridge.from, bridge.to, t);
@@ -2090,13 +2228,12 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         return bridge.age >= bridge.duration;
       }
       function flyTo(position, target, { duration = 3.3, onArrive, label } = {}) {
+        exteriorOverviewFramed = false;
         flight = { bridge: makeBridge(position, target, duration), onArrive };
         if (label) setMode(label, true);
       }
-      function focusOverview() {
-        const upper = explosionTarget > .1;
-        flyTo(V(upper ? 185 : 154, upper ? 155 : 106, upper ? 255 : 203), V(0, upper ? 82 : 50, 0),
-          { duration: 3.3, label: upper ? '展开楼阁结构' : '建筑探索' });
+      function focusOverview({ duration = 2.4, label = viewNames[view] } = {}) {
+        focusVisibleLayers({ duration, label });
       }
 
       let parkStop = 'overview';
@@ -2108,7 +2245,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
         const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
         const topControls = document.querySelector('.top-controls').getBoundingClientRect();
-        const bottom = width <= 720 ? sidebar.top - 12 : height - 40;
+        const bottom = width <= 720 ? Math.min(sidebar.top - 12, $('scene-tools').getBoundingClientRect().top - 10) : height - 76;
         return { width, height, left: width <= 720 ? 12 : sidebar.right + 24, right: width - 16,
           top: Math.min(bottom - 96, topControls.bottom + 16), bottom };
       }
@@ -2168,7 +2305,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         resize();
         const framing = id === 'overview' ? parkOverviewCamera() : { position: parkPoint(item.position), target: parkPoint(item.target) };
         flyTo(framing.position, framing.target,
-          { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3.4, label: '游园 · ' + item.title });
+          { duration: 3.4, label: '游园 · ' + item.title });
         renderer.shadowMap.needsUpdate = true;
       }
       $('park-overview').addEventListener('click', () => selectParkStop('overview'));
@@ -2190,6 +2327,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       const routePosition = V();
       const routeTotal = EXPERIENCE.scenes.reduce((sum, scene) => sum + scene.approach + scene.duration, 0);
       function sampleRoute(index, progress, position, target) {
+        if (visitorExperience.reducedMotion) progress = [.6, .12, .48, 1][index];
         const t = smooth(progress);
         if (index === 0) {
           position.lerpVectors(V(410,274,580), V(235,156,335), t);
@@ -2198,6 +2336,8 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           const angle = Math.PI * 2 * t;
           position.set(Math.sin(angle)*184, 82 + Math.sin(Math.PI*t)*9, Math.cos(angle)*184);
           target.set(0,50,0);
+          const frame = fitVisitorBounds(THREE, parkTowerBounds, position.clone().sub(target), camera, parkViewingRect(), .94, exteriorBoxes);
+          position.copy(frame.position); target.copy(frame.target);
         } else if (index === 2) {
           platformPath.getPointAt(t, position);
           target.lerpVectors(V(0,76,0), V(-140,32,-650), smooth(Math.min(1,t*1.14)));
@@ -2214,10 +2354,21 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         $('next-scene').disabled = tour.index === 3;
         $('tour-counter').textContent = `${tour.index + 1} / 4`;
         const name = ['一','二','三','四'][tour.index];
-        setMode(`${tour.paused ? tour.interrupted ? '已接管' : '已暂停' : tour.continuous ? '连游中' : '巡航中'} · 第${name}境`, !tour.paused);
-        $('tour-tip').textContent = tour.paused ? '点击继续，从当前视角平滑接回导览。' : '拖拽或缩放可随时接管，随后可继续。';
+        setMode(`${tour.paused ? tour.interrupted ? '已接管' : '已暂停' : visitorExperience.reducedMotion ? '静览中' : tour.continuous ? '连游中' : '巡航中'} · 第${name}境`, !tour.paused);
+        $('tour-tip').textContent = tour.paused
+          ? visitorExperience.reducedMotion ? '点击继续，回到本境的固定视角。' : '点击继续，从当前视角平滑接回导览。'
+          : visitorExperience.reducedMotion ? '固定视角欣赏山河，也可手动转动或缩放。' : '拖拽或缩放可随时接管，随后可继续。';
+      }
+      function tourCaption(index) {
+        return visitorExperience.reducedMotion ? [
+          '从黄河东岸，远望楼阁与山河。',
+          '静看楼阁，读懂高台、层檐与柱列的节奏。',
+          '来到高处，让视线越过层檐。',
+          '静赏落日长河，让四句唐诗回到风景里。'
+        ][index] : EXPERIENCE.scenes[index].caption;
       }
       function startTour(index, { continuous = false, internal = false } = {}) {
+        exteriorOverviewFramed = false;
         if (!internal) sound.ensureFromGesture();
         haltMotion();
         switchView('tour', { keepMotion: true });
@@ -2235,7 +2386,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         });
         setTime(index === 3);
         showPoem(index === 3);
-        showCaption(`山河四境 · ${['壹','贰','叁','肆'][index]}`, info.caption);
+        showCaption(`山河四境 · ${['壹','贰','叁','肆'][index]}`, tourCaption(index));
         sound.speak('scene-' + index);
         $('play-all').textContent = continuous ? '重新启程 · 连游四境' : '从头连游四境';
         updatePlayer();
@@ -2397,21 +2548,23 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       });
       $('close-detail').addEventListener('click', () => { closeDetail(); sound.stopVoice(); showCaption('', ''); });
 
-      function focusVisibleLayers() {
+      function focusVisibleLayers({ duration = 2.4, label } = {}) {
         const bounds = new THREE.Box3();
+        const boxes = [];
         model.scene.updateMatrixWorld(true);
         for (const group of layerGroups) {
           if (!group.visible) continue;
-          const box = new THREE.Box3().setFromObject(group);
           const futureDelta = layerOffsets[group.userData.tier] * explosionTarget * 1.4 - group.position.y * 1.4;
-          box.translate(V(0, futureDelta, 0)); bounds.union(box);
+          group.traverse(mesh => {
+            if (!mesh.isMesh) return;
+            const box = new THREE.Box3().setFromObject(mesh);
+            box.translate(V(0, futureDelta, 0)); bounds.union(box); boxes.push(box);
+          });
         }
         if (bounds.isEmpty()) return;
-        const target = bounds.getCenter(V());
-        const size = bounds.getSize(V());
-        const distance = Math.max(95, size.x * 1.7, size.y * 2.2, size.z * 1.55);
-        const offset = V(.58, .39, .85).normalize().multiplyScalar(distance);
-        flyTo(target.clone().add(offset), target, { duration: 3.1, label: tierFilter === 'all' ? '楼阁结构 · 全楼' : '楼阁结构 · ' + ['台基与外阶','楼身一至三层','楼身四至五层','楼身六层与屋顶'][Number(tierFilter)] });
+        const frame = fitVisitorBounds(THREE, bounds, V(.58, .39, .85), camera, parkViewingRect(), .94, boxes);
+        flyTo(frame.position, frame.target, { duration, label: label || (tierFilter === 'all' ? '楼阁结构 · 全楼' : '楼阁结构 · ' + ['台基与外阶','楼身一至三层','楼身四至五层','楼身六层与屋顶'][Number(tierFilter)]) });
+        exteriorOverviewFramed = true;
       }
       $('explode-button').addEventListener('click', () => {
         interiorExplorer?.exit();
@@ -2436,7 +2589,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       }));
       function updateLayers(delta) {
         if (Math.abs(explosion - explosionTarget) < .0003) return;
-        explosion += (explosionTarget - explosion) * (1 - Math.exp(-delta * 4.2));
+        explosion += (explosionTarget - explosion) * (visitorExperience.reducedMotion ? 1 : 1 - Math.exp(-delta * 4.2));
         if (Math.abs(explosion - explosionTarget) < .0003) explosion = explosionTarget;
         layerGroups.forEach(group => { group.position.y = layerOffsets[group.userData.tier] * explosion; });
         model.scene.updateMatrixWorld(true);
@@ -2448,6 +2601,8 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         afterExit: focusOverview,
         onLayoutChange: resize,
         beforeEnter: () => {
+          visitorExperience.expandPanel();
+          exteriorOverviewFramed = false;
           haltMotion(); closeDetail(); highlightPart(null); showPoem(false); resetStructure(); setTime(false);
           explosion = 0; layerGroups.forEach(group => { group.position.y = 0; });
         }
@@ -2470,6 +2625,8 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       let layoutBounds = { left: 300, bottom: window.innerHeight, phone: false };
       function refreshLayoutBounds() {
         const sidebar = document.querySelector('.sidebar').getBoundingClientRect();
+        document.documentElement.style.setProperty('--sidebar-top', sidebar.top + 'px');
+        document.documentElement.style.setProperty('--sidebar-edge', sidebar.right + 'px');
         layoutBounds = { left: window.innerWidth > 720 ? sidebar.right : 0,
           bottom: window.innerWidth > 720 ? window.innerHeight - 35 : sidebar.top - 10,
           phone: window.innerWidth <= 720 };
@@ -2501,6 +2658,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
       let pointerStart = null;
       function interruptMotion() {
         if (interiorExplorer?.walking) return;
+        exteriorOverviewFramed = false;
         parkOverviewFramed = false;
         if (tour) { pauseTour(true); return; }
         if (flight || poetrySequence) {
@@ -2541,6 +2699,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         if (!$('sound-settings').hidden && !$('sound-settings').contains(event.target) && !$('sound-settings-toggle').contains(event.target)) closeSoundSettings();
       }, { passive: true });
       window.addEventListener('keydown', event => {
+        if (visitorExperience.covered || event.defaultPrevented) return;
         if (event.key === 'Escape' && !$('postcard-dialog').open) {
           if (tour) pauseTour(true); else interruptMotion();
           closeSoundSettings(); closeDetail(); showPoem(false);
@@ -2601,17 +2760,16 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
           if (postcardURL) URL.revokeObjectURL(postcardURL);
           postcardURL = URL.createObjectURL(blob);
           $('postcard-preview').src = postcardURL;
+          $('download-postcard').href = postcardURL;
           $('postcard-status').textContent = '明信片包含当前视角、所选诗句与已收集的印章。';
           $('postcard-dialog').showModal();
         } catch (error) {
           console.error('Postcard:', error); notify('明信片暂未生成，请稍后再试一次。');
         } finally { capturing = false; $('capture-postcard').disabled = false; }
       });
-      $('download-postcard').addEventListener('click', () => {
-        if (!postcardURL) return;
-        const link = document.createElement('a'); link.href = postcardURL;
-        link.download = '鹳雀凌云_观景明信片.png'; document.body.appendChild(link); link.click(); link.remove();
-        $('postcard-status').textContent = '已准备下载。手机也可长按明信片图片保存。';
+      $('download-postcard').addEventListener('click', event => {
+        if (!postcardURL) { event.preventDefault(); return; }
+        $('postcard-status').textContent = '如未开始下载，可在打开的图片上保存；手机也可长按图片保存。';
       });
       $('close-postcard').addEventListener('click', () => $('postcard-dialog').close());
       $('retake-postcard').addEventListener('click', () => $('postcard-dialog').close());
@@ -2619,42 +2777,80 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
 
       function resize() {
         const width = Math.max(1, window.innerWidth), height = Math.max(1, window.innerHeight);
+        const touchInput = width <= 720 || matchMedia('(pointer: coarse)').matches;
+        const exteriorHint = touchInput ? '单指转动 · 双指缩放' : '拖拽转动视角 · 滚轮缩放';
+        if (!tour) $('tour-tip').textContent = exteriorHint;
+        if (!interiorExplorer?.active) $('view-hint').textContent = view === 'explore' ? '点击构件或标记，靠近读一座楼' : exteriorHint;
+        renderer.domElement.setAttribute('aria-label', interiorExplorer?.walking ? '鹳雀楼楼内场景，拖动环视，使用方向按钮行走' : '鹳雀楼三维场景，' + exteriorHint);
+        refreshLayoutBounds();
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.25 : 1.6, Math.sqrt(2800000 / (width * height))));
         renderer.setSize(width, height); camera.aspect = width / height;
         if (interiorExplorer?.active) interiorExplorer.layout();
-        else if (view === 'park') {
+        else {
           const rect = parkViewingRect();
           camera.setViewOffset(width, height, (width - rect.left - rect.right) / 2, (height - rect.top - rect.bottom) / 2, width, height);
         }
-        else if (width > 720) {
-          const sidebarWidth = width > 1050 ? 300 : 267;
-          camera.setViewOffset(width, height, -Math.min(width * .1, sidebarWidth * .44), 0, width, height);
-        } else camera.setViewOffset(width, height, 0, height * .13, width, height);
         camera.updateProjectionMatrix(); refreshLayoutBounds();
         if (!interiorExplorer?.active) controls.maxDistance = Math.max(1450, parkOverviewCamera().distance * 1.12);
       }
-      window.addEventListener('resize', () => {
+      function reframeLayout() {
         resize();
         if (view === 'park' && parkOverviewFramed) selectParkStop('overview');
-        else interiorExplorer?.reframe();
-      }, { passive: true });
-      const sidebarObserver = new ResizeObserver(refreshLayoutBounds);
+        else if (exteriorOverviewFramed && !interiorExplorer?.active && !tour) focusOverview({ duration: 0 });
+        else if (interiorExplorer?.active && !interiorExplorer.walking) interiorExplorer.reframe();
+      }
+      window.addEventListener('resize', reframeLayout, { passive: true });
+      let sidebarResizeFrame = null;
+      const sidebarObserver = new ResizeObserver(() => {
+        cancelAnimationFrame(sidebarResizeFrame);
+        sidebarResizeFrame = requestAnimationFrame(reframeLayout);
+      });
       sidebarObserver.observe(document.querySelector('.sidebar'));
       resize();
+      visitorExperience.connect({
+        onTour: () => startTour(0, { continuous: true }),
+        onHome: () => {
+          switchView('tour'); closeSoundSettings();
+          focusOverview({ duration: 1.8 });
+          renderer.domElement.focus({ preventScroll: true });
+        },
+        onPanelChange: reframeLayout,
+        onMotionChange: () => {
+          clearControlMomentum();
+          const descriptions = visitorExperience.reducedMotion
+            ? ['望河 · 静观大河', '观楼 · 静赏层檐', '临高 · 固定视角观景', '入诗 · 落日长河']
+            : ['望河 · 远景入境', '观楼 · 环楼一周', '临高 · 沿楼外侧观景', '入诗 · 落日长河'];
+          sceneButtons.forEach((button, index) => { button.querySelector('.scene-description').textContent = descriptions[index]; });
+          if (tour) {
+            updatePlayer();
+            if (tour.index !== 3 || tour.elapsed < 7.1) showCaption(`山河四境 · ${['壹','贰','叁','肆'][tour.index]}`, tourCaption(tour.index));
+          }
+        },
+        onCoverChange: covered => {
+          if (covered) {
+            interiorExplorer.suspendInput();
+            if (tour) pauseTour();
+            else if (flight || poetrySequence) interruptMotion();
+          }
+          sound.visibility(covered || document.hidden);
+        }
+      });
+      focusOverview({ duration: 0 });
       let previousTime = performance.now();
       let waterTime = 0;
       let firstFrame = true;
       document.addEventListener('visibilitychange', () => {
-        previousTime = performance.now(); sound.visibility(document.hidden);
+        previousTime = performance.now(); sound.visibility(document.hidden || visitorExperience.covered);
       });
       renderer.setAnimationLoop(now => {
         const delta = Math.min(Math.max((now - previousTime) / 1000, 0), .05);
         previousTime = now;
-        if (document.hidden) return;
-        waterTime += delta; waterUniforms.uTime.value = waterTime;
+        if (document.hidden || (!firstFrame && visitorExperience.covered)) return;
+        if (!visitorExperience.reducedMotion) waterTime += delta;
+        waterUniforms.uTime.value = waterTime;
         scenicPark.tick();
         if (Math.abs(requestedLight - lightAmount) > .0001) {
-          lightAmount += (requestedLight - lightAmount) * (1 - Math.exp(-delta * 1.6));
+          lightAmount += (requestedLight - lightAmount) * (visitorExperience.reducedMotion ? 1 : 1 - Math.exp(-delta * 1.6));
           if (Math.abs(requestedLight - lightAmount) < .0001) lightAmount = requestedLight;
           applyLighting(lightAmount);
         }
@@ -2684,7 +2880,7 @@ function createScenicPark({ THREE, GLTFLoader, scene, renderer, assetURL, waterM
         scene.fog.density = mix(.00030, .00036, lightAmount) * Math.min(1, 1000 / Math.max(1, orbitDistance));
         renderer.render(scene, camera);
         updateHotspots();
-        if (firstFrame) { firstFrame = false; loading.classList.add('ready'); }
+        if (firstFrame) { firstFrame = false; loading.classList.add('ready'); visitorExperience.ready(); }
       });
 
     }
