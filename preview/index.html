@@ -8,8 +8,8 @@
   <meta name="description" content="鹳雀凌云：沿黄河游览鹳雀楼，听声景、识斗拱、赏唐诗，收集六枚山河印章，留下自己的观景明信片。">
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
-  <base href="../">
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=acc7a53d7ad8">
+
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=14cc1e3408b0">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=9f505e58ea21" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -21,7 +21,7 @@
   <main id="stage" aria-label="鹳雀楼三维漫游场景"></main>
   <div id="hotspots" aria-label="建筑探索点" hidden></div>
 
-  <aside class="sidebar" aria-label="漫游导航">
+  <aside class="sidebar" id="tour-navigation" aria-label="漫游导航">
     <header class="brand">
       <div><p class="eyebrow">黄河东岸 · 山西永济</p><h1>鹳雀凌云</h1></div>
       <span class="brand-seal" aria-hidden="true">登临</span>
@@ -37,7 +37,7 @@
       <button id="tab-keepsake" role="tab" data-view="keepsake" aria-selected="false" aria-controls="view-keepsake" tabindex="-1">留念</button>
     </nav>
 
-    <div class="view-body">
+    <div class="view-body" id="navigation-content">
       <section id="view-tour" class="view-pane" role="tabpanel" aria-labelledby="tab-tour">
         <button class="primary-button" id="play-all"><span class="play-triangle" aria-hidden="true"></span>启程 · 连游四境<span class="button-tail">约 2 分钟</span></button>
         <p class="pane-note">从大河入境，到落日吟诗。初次启程开启声景。</p>
@@ -187,11 +187,14 @@
 
   <div id="interior-legend" class="interior-legend" aria-live="polite" hidden><strong id="interior-legend-floor">九层结构示意</strong><span>平面与部分层高推定</span><div><i class="known-dot"></i>有标高依据 <i class="estimated-dot"></i>标高推定</div></div>
   <div id="walk-fade" class="walk-fade" aria-hidden="true"></div>
-  <aside id="walk-story" class="walk-story" aria-label="楼层故事" aria-live="polite" hidden>
+  <aside id="walk-story" class="walk-story" aria-label="楼层故事" hidden>
+    <div class="walk-story-reading">
     <button id="walk-close-story" class="close-panel" aria-label="收起楼层故事">×</button>
-    <p id="walk-story-floor" class="eyebrow"></p><h2 id="walk-story-title"></h2><p id="walk-story-lead" class="detail-lead"></p><div id="walk-story-body"></div>
+    <p id="walk-story-floor" class="eyebrow"></p><h2 id="walk-story-title" tabindex="-1"></h2><p id="walk-story-lead" class="detail-lead"></p><div id="walk-story-body"></div>
     <button id="walk-read-story" class="outline-button" hidden>听本层故事</button><a id="walk-story-source" class="source-link" target="_blank" rel="noopener noreferrer">查阅故事依据 ↗</a>
     <p id="walk-story-scope" class="microcopy">六层故事为数字导览主题编排，不代表真实展厅用途。</p>
+    </div>
+    <div class="walk-story-actions"><button id="walk-continue" class="primary-button">读完了，继续漫游 →</button></div>
   </aside>
   <aside id="detail-panel" class="detail-panel" aria-label="探索详情" hidden>
     <button class="close-panel" id="close-detail" aria-label="收起探索详情">×</button>
@@ -210,6 +213,50 @@
   <div class="caption-bar" id="caption-bar" hidden><span id="caption-kicker"></span><p id="caption-text" aria-live="polite"></p></div>
   <div id="toast" class="toast" role="status" hidden></div>
   <div class="view-hint" id="view-hint">拖拽转动视角 <span>·</span> 滚轮缩放</div>
+  <div id="scene-tools" class="scene-tools" role="group" aria-label="游览快捷操作">
+    <button id="home-view" disabled>回到楼前</button>
+    <button id="visitor-help" aria-haspopup="dialog" aria-controls="visitor-guide" disabled>游览帮助</button>
+    <button id="panel-toggle" aria-expanded="true" aria-controls="navigation-content" disabled>收起面板</button>
+  </div>
+
+  <dialog id="visitor-guide" class="visitor-guide" aria-labelledby="visitor-title" aria-describedby="visitor-intro">
+    <button id="close-visitor-guide" class="close-panel" aria-label="关闭游览帮助">×</button>
+    <p class="eyebrow" id="visitor-eyebrow">黄河东岸 · 山西永济</p>
+    <h2 id="visitor-title">从这一楼，走进山河</h2>
+    <p id="visitor-intro">跟随镜头认识鹳雀楼，也可以自己转一转、入楼读故事。</p>
+    <div class="visitor-choices">
+      <button id="visitor-tour" class="primary-button">跟随导览 <span class="button-tail">约 2 分钟</span></button>
+      <button id="visitor-explore" class="outline-button">自由看楼 <span>自己选择路线</span></button>
+    </div>
+    <dl class="visitor-tips">
+      <div><dt>看楼</dt><dd><span class="desktop-tip">拖拽转动，滚轮缩放。</span><span class="mobile-tip">单指转动，双指缩放。</span>迷失视角时，点“回到楼前”。</dd></div>
+      <div><dt>入楼</dt><dd>在“观筑”里进入楼内；到达楼身六层会展开故事。读完后继续漫游。</dd></div>
+      <div><dt>留念</dt><dd>在“留念”里保存观景明信片，无需集齐印章。</dd></div>
+    </dl>
+    <label class="visitor-motion"><input id="visitor-reduced-motion" type="checkbox"><span>减少镜头运动<small>四境采用固定视角，切换楼层直接到达。</small></span></label>
+    <div class="visitor-bottom"><button id="visitor-system-motion" class="text-button" hidden>跟随设备的动态设置</button><a href="#reading-guide">图文游览 ↗</a></div>
+    <p class="visitor-note">声音可在右上角开关和调节。你的探索进度保存在当前浏览器。</p>
+  </dialog>
+
+  <section id="reading-guide" class="reading-guide" aria-labelledby="reading-title" tabindex="-1">
+    <div class="reading-content">
+      <a href="#" class="reading-return">← 返回三维场景</a>
+      <p class="eyebrow">黄河东岸 · 山西永济</p>
+      <h2 id="reading-title">一楼阅千年</h2>
+      <p class="reading-intro">暂时不便操作三维画面，也可以在这里读建筑、赏唐诗，按自己的节奏了解鹳雀楼。</p>
+      <div class="reading-facts"><p><strong>73.9 米</strong><span>现代复建楼总高</span></p><p><strong>九层结构</strong><span>台基三层 · 楼身六层</span></p><p><strong>六段故事</strong><span>数字导览的楼层主题</span></p></div>
+      <h3>诗里的鹳雀楼</h3><blockquote>白日依山尽，黄河入海流。<br>欲穷千里目，更上一层楼。<cite>唐 · 王之涣《登鹳雀楼》</cite></blockquote>
+      <h3>随楼层读故事</h3><p>楼身六层编排文化故事；台基三层介绍建筑结构。以下主题不对应真实展厅分配。</p>
+      <details><summary>楼身1层 · 河畔起高楼</summary><p>从这一层，先听古楼的来处。</p><p>据景区介绍，鹳雀楼始建于北周，最初具有军事戍楼的用途，因鹳雀常来栖息而得名。楼临黄河、远望中条，地理位置与登临视野一起构成了它的记忆。</p><p>眼前的三维模型表现的是现代复建楼。复建工程于 1997 年启动，2002 年开放；古楼的故事，借新的建筑空间继续被人们讲述。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <details><summary>楼身2层 · 二十字里的山河</summary><p>一首短诗，把登临写成了千年的记忆。</p><p>“白日依山尽，黄河入海流。欲穷千里目，更上一层楼。”王之涣的《登鹳雀楼》只有四句二十字，却把落日、大河与登高的动作连在了一起。</p><p>前两句展开眼前山河，后两句把视线引向更远的地方。此层的数字主题从诗意出发，不代表这里真实设有某一座诗歌展厅。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <details><summary>楼身3层 · 楼隐，诗传</summary><p>建筑曾经消失，登临的记忆仍在。</p><p>据景区介绍，古鹳雀楼曾毁于战火，此后长期未获重建。这里不把今天的复建楼当成从古代原样留存的建筑。</p><p>楼可以隐去，诗却一代代传下来。《登鹳雀楼》让黄河岸边的登临经验越过时间，也让后来的重建有了人们熟悉的文化记忆。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <details><summary>楼身4层 · 重建，再续登临</summary><p>新的楼阁，回应久远的文化记忆。</p><p>据景区介绍，鹳雀楼于 1997 年 12 月启动重建，2002 年 9 月 26 日正式对外开放。今天眼前的楼阁，是这次现代复建的成果。</p><p>复建采用仿唐形制，把高台、柱列与层檐重新带到黄河岸边。它延续的是古楼与诗文的文化记忆，具体空间和工程构造属于现代建筑。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <details><summary>楼身5层 · 唐风与今工</summary><p>檐下的古意，来自今天的建造。</p><p>复建楼采用框架剪力墙结构，并组合预制与现浇的仿古混凝土构件。眼前的柱、枋、斗拱和层檐，以现代工程方法表现仿唐楼阁的建筑节奏。</p><p>施工方案记载，在楼身第五层平面处，外槽柱轴线向内移动 500 毫米。这一处明确的调整，让我们能把上部收敛的轮廓，与具体的建造尺寸联系起来。</p><a target="_blank" rel="noopener noreferrer" href="https://www.gc5.com/jzgc/jzsg/10190840.html">查阅故事依据 ↗</a></details>
+      <details><summary>楼身6层 · 更上一层楼</summary><p>走到高处，再把目光交给山河。</p><p>楼身六层对应外观的第三层。包括台基与最高脊饰在内，复建楼总高 73.9 米；楼层地坪、屋顶和最高大吻，属于不同的高度基准。</p><p>这次数字登临，从台基与柱梁走到楼阁高处。回到“更上一层楼”，也可以把它读作一次不断拓展视野的邀请。此处故事与路线为数字导览编排，不表示真实开放区域。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <h3>这座数字楼阁</h3><p>模型以实景照片和公开工程资料为依据。内部平面、部分标高和景区周边尺寸仍有推定，用于文化与结构展示。实际开放区域和现场路线以景区公布的信息为准。</p>
+      <p class="reading-footer">鹳雀凌云 · 鹳雀楼数字化漫游</p>
+    </div>
+  </section>
 
   <dialog id="postcard-dialog" class="postcard-dialog" aria-labelledby="postcard-title">
     <div class="dialog-heading"><h2 id="postcard-title">这一眼山河</h2><button id="close-postcard" class="close-panel" aria-label="关闭明信片预览">×</button></div>
@@ -218,9 +265,9 @@
     <p class="microcopy" id="postcard-status">明信片包含当前视角、所选诗句与已收集的印章。</p>
   </dialog>
 
-  <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button></div>
-  <noscript><div class="no-script">请启用 JavaScript，进入鹳雀楼数字化漫游。</div></noscript>
+  <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button><a class="loading-reading" href="#reading-guide">先读建筑与楼层故事 ↗</a></div>
+  <noscript><div class="no-script"><p>三维漫游需要启用 JavaScript。</p><a href="#reading-guide">打开图文游览，阅读建筑与楼层故事 ↗</a></div></noscript>
 
-  <script type="module" src="./assets/experience-v2.js?v=acc7a53d7ad8"></script>
+  <script type="module" src="./assets/experience-v2.js?v=14cc1e3408b0"></script>
 </body>
 </html>
