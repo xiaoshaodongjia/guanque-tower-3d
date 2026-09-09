@@ -1,5 +1,5 @@
 {
-  "revision": "engineering-reference-2026-09-06",
+  "revision": "photo-exterior-2026-09-09",
   "units": "metres",
   "totalHeight": 73.9,
   "entranceElevation": 16.5,
@@ -39,10 +39,34 @@
     0.9
   ],
   "fifthStoreyAxisInset": 0.5,
+  "exteriorReferenceFit": {
+    "topRidgeWallLength": 21.5,
+    "topEavesWidth": 44.0,
+    "topPavilions": [
+      "front",
+      "back",
+      "left",
+      "right"
+    ],
+    "scope": "Roof proportions are fitted to front and oblique photographs, not surveyed dimensions.",
+    "podium": "Two broad front flights, a widened intermediate terrace, paired turning side stairs, and four short entrance flights; dimensions and tread counts are photographic/ergonomic fits, not measured records.",
+    "plaques": {
+      "entrance": "文萃李唐",
+      "entranceReading": "right-to-left",
+      "upper": "鹳雀楼",
+      "rightCouplet": "凌空白日三千丈",
+      "leftCouplet": "拔地黄河第一楼",
+      "lettering": "Calligraphic type, not a facsimile of the original handwriting."
+    }
+  },
   "extent": "Exterior reference model; no measured interior plan. Missing levels and plan dimensions are not asserted.",
   "sources": [
     "http://sxgql.com/?about/",
     "https://www.gc5.com/jzgc/jzsg/10190840.html",
-    "http://123.57.212.98/html/tm/29/38/69/content/1433.html"
+    "http://123.57.212.98/html/tm/29/38/69/content/1433.html",
+    "http://cdcn.org.cn/article/28081",
+    "http://sx.news.cn/20240719/78c1f36782774b1aa7f55b3e0f8b6f5e/c.html",
+    "https://www.sohu.com/a/920450889_428863",
+    "https://www.meipian.cn/2fdm0o2y"
   ]
 }

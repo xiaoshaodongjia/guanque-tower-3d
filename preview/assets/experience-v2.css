@@ -268,6 +268,7 @@
   .walk-story.is-exhibit #walk-story-body p{font-size:13px;line-height:1.8;margin-bottom:12px}
   .walk-story.is-exhibit .walk-story-actions{display:flex;align-items:center;gap:8px;padding:8px}
   .walk-story.is-exhibit .walk-exhibit-pagination{flex:0 0 150px;gap:3px;margin:0}
-  .walk-story.is-exhibit .walk-exhibit-pagination button{min-height:44px;font-size:11px;padding:7px}
+  .walk-story.is-exhibit .walk-exhibit-pagination button{min-height:44px;font-size:11px;padding:7px 4px;white-space:nowrap}
+  .walk-story.is-exhibit .walk-exhibit-pagination span{white-space:nowrap}
   .walk-story.is-exhibit .walk-story-actions>.primary-button{flex:1;min-width:0;font-size:12px;padding:8px}
 }
