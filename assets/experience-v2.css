@@ -181,3 +181,8 @@
   .walking .walk-panel strong { font-size: 18px; }
   .walking .interior-label { margin-top: 10px; }
 }
+.showcase-views{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 12px}
+.showcase-views[hidden]{display:none}
+.showcase-views button{padding:12px 10px;text-align:left;border:1px solid rgba(201,180,133,.28);background:rgba(201,180,133,.055);color:var(--text,#ece5d3);font:inherit;cursor:pointer}
+.showcase-views button span{display:block;margin-top:5px;font-size:11px;color:var(--muted,#a0aa9e)}
+.showcase-views button:hover,.showcase-views button:focus-visible{border-color:#bda573;background:rgba(201,180,133,.12)}
