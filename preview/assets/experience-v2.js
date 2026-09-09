@@ -652,11 +652,18 @@ function drawHallArtwork(ctx, width, height, id) {
       ctx.lineTo(w,h);ctx.fillStyle=['#b3c5b5','#a0b7a6','#97af9e','#90a58b'][k];ctx.fill();
     }
     path('M1245 190 Q1320 263 1250 360 L1170 500 L1600 500 L1600 197Z','#c7b98b',null);
-    for(let row=0;row<5;row++)for(let col=0;col<24;col++){
-      const x=20+col*49+(row%2)*18,y=228+row*43+Math.sin(col*3)*7;
+    for(let row=0;row<7;row++)for(let col=0;col<26;col++){
+      const x=12+col*46+(row%2)*14,y=205+row*33+Math.sin(col*3)*4;
       if(x>515&&x<575)continue;
-      pavilion(x,y,.19+row*.035,(row+col)%13===0?2:1);
-      if((row*13+col)%7===0)tree(x+21,y,.32);
+      const bw=27+row*2.5,depth=14+row*1.2;
+      // Most of the real panorama is low, densely packed grey roofscape.
+      // Tall open pavilions are reserved for the major city landmarks.
+      ctx.fillStyle='#d9d4b3';ctx.fillRect(x-bw*.50,y-3,bw,10);
+      path(`M${x-bw*.61} ${y} L${x-bw*.26} ${y-depth} L${x+bw*.38} ${y-depth} L${x+bw*.61} ${y-1}Z`,'#52675e','#a5b4a0',1);
+      line([[x-bw*.26,y-depth],[x+bw*.38,y-depth]],'#c0baa0',1.7);
+      line([[x-bw*.53,y+2],[x+bw*.54,y+2]],'#384f44',2);
+      for(let i=0;i<3;i++){ctx.fillStyle='#7c7455';ctx.fillRect(x-bw*.3+i*bw*.27,y+3,bw*.10,4);}
+      if((row*13+col)%9===0)tree(x+20,y+8,.20);
     }
     path('M495 207 L552 207 L716 500 L469 500Z','#e0d7bb','#bab997',2);
     for(const [x,y,s] of [[531,259,.7],[644,410,1.0],[1120,390,.65]])pavilion(x,y,s,2);
@@ -747,12 +754,12 @@ function buildPufanMiniature({THREE,parent,box,materials:m,item}) {
   roofGeometry.computeVertexNormals();
   const canopyGeometry=new THREE.IcosahedronGeometry(1,1),roundGeometry=new THREE.SphereGeometry(1,8,6);
   function roof(x,y,z,w,d,detail=false){
-    const mesh=new THREE.Mesh(roofGeometry,m.cityRoof);mesh.position.set(x,y,z);mesh.scale.set(w,w*.56,d);parent.add(mesh);
-    box(parent,w*.67,.027,.035,x,y+w*.168+.014,z,m.cityRidge);
+    const mesh=new THREE.Mesh(roofGeometry,m.cityRoof);mesh.position.set(x,y,z);mesh.scale.set(w,w*.76,d);parent.add(mesh);
+    box(parent,w*.67,.021,.030,x,y+w*.228+.013,z,m.cityRidge);
     for(const a of [-1,1])box(parent,w*1.13,.024,.03,x,y+.008,z+a*d*.54,m.cityRidge);
     if(detail)for(let i=-4;i<=4;i++){
       // Raised ribs stop above the roof surface, preventing equal-depth edges.
-      const rib=box(parent,.014,.016,d*.53,x+i*w*.108,y+w*.075,z+d*.25,m.cityRidge);rib.rotation.x=.30;
+      const rib=box(parent,.014,.016,d*.53,x+i*w*.108,y+w*.106,z+d*.25,m.cityRidge);rib.rotation.x=.42;
     }
   }
   function building(x,y,z,w=.48,h=.27,d=.21,levels=1){
@@ -778,20 +785,20 @@ function buildPufanMiniature({THREE,parent,box,materials:m,item}) {
   }
   // Four rising strips read as streets and courtyards from eye level and above.
   for(let row=0;row<4;row++){
-    const y=bottom+.18+row*.43,z=.43-row*.275;
+    const y=bottom+.18+row*.36,z=.43-row*.275;
     box(parent,8.52,.14,.268,-1.07,y-.07,z,m.cityStone);
     box(parent,.51,.028,.268,-1.10,y+.02,z,m.cityRoad);
     for(let col=0;col<17;col++){
       const x=-5.1+col*.49+(row%2)*.10;
       if(Math.abs(x+1.10)<.58)continue;
-      const w=.35+(col%3)*.055,height=.22+((row+col)%3)*.052;
+      const w=.35+(col%3)*.055,height=.14+((row+col)%3)*.035;
       building(x,y,z,w,height,.18,((col+row*3)%13===0)?2:1);
       if((col+row)%3===0)tree(x+.21,y,z+.07,.76);
       if(col%2===0)person(x+.17,y,z+.103,[m.cityRed,m.blue,m.ivory][(col+row)%3],.74);
     }
   }
   // Raised city gates and a clear axial street interrupt the repeated rooftops.
-  for(const [x,y,z,w] of [[-1.1,bottom+.17,.47,1.02],[-1.1,bottom+1.04,-.10,.70],[2.54,bottom+.63,.01,.54]]){
+  for(const [x,y,z,w] of [[-1.1,bottom+.17,.47,1.02],[-1.1,bottom+.90,-.10,.70],[2.54,bottom+.54,.01,.54]]){
     for(const side of [-1,1])box(parent,w*.29,.43,.24,x+side*w*.355,y+.215,z,m.cityWall);
     box(parent,w,.11,.24,x,y+.45,z,m.cityWall);
     building(x,y+.50,z,w*.82,.25,.24,2);
@@ -808,7 +815,7 @@ function buildPufanMiniature({THREE,parent,box,materials:m,item}) {
     box(parent,.32,.05,.12,x,bottom+.15,.43,m.cityDoor);
     person(x+.20,bottom+.05,.53,m.blue,.9);
   }
-  for(let i=0;i<8;i++)person(-.86+(i%2)*.20,bottom+.20+Math.floor(i/2)*.42,.47-Math.floor(i/2)*.275,m.cityRed,.95);
+  for(let i=0;i<8;i++)person(-.86+(i%2)*.20,bottom+.20+Math.floor(i/2)*.36,.47-Math.floor(i/2)*.275,m.cityRed,.95);
   // River and the bridge have separate, solid surfaces; no animated overlays.
   box(parent,2.02,.06,1.13,4.23,bottom+.05,0,m.cityWater);
   box(parent,.14,.16,1.14,3.29,bottom+.10,0,m.cityStone);
@@ -953,8 +960,8 @@ function createFirstFloorGallery({THREE,scene,getArchitecture=()=>null}) {
     const palette=getFirstHallPalette(THREE),hall=INTERIOR.storeys[3],gallery=INTERIOR.storeys[4];
     const galleryY=gallery.z-hall.z,ceilingY=INTERIOR.storeys[5].z-hall.z-.28;
     const materials={
-      cityRoof:new THREE.MeshStandardMaterial({color:'#465b58',roughness:.84}),
-      cityRidge:new THREE.MeshStandardMaterial({color:'#a5a68d',roughness:.8}),
+      cityRoof:new THREE.MeshStandardMaterial({color:'#364742',roughness:.84}),
+      cityRidge:new THREE.MeshStandardMaterial({color:'#79867b',roughness:.8}),
       cityWall:new THREE.MeshStandardMaterial({color:'#ded7b7',roughness:.85}),
       cityStone:new THREE.MeshStandardMaterial({color:'#a8aa91',roughness:.88}),
       cityRoad:new THREE.MeshStandardMaterial({color:'#d4c7a6',roughness:.9}),
