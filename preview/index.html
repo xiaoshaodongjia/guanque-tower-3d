@@ -8,10 +8,10 @@
   <meta name="description" content="鹳雀凌云：沿黄河游览鹳雀楼，听声景、识斗拱、赏唐诗，收集六枚山河印章，留下自己的观景明信片。">
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
-  <base href="../">
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=87f97292f95c">
+
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=5ef72ba37c74">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
-  <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=bc338b86ddc2" crossorigin="anonymous" fetchpriority="high">
+  <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=0564c40b2b4b" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/addons/controls/OrbitControls.js">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/addons/loaders/GLTFLoader.js">
@@ -66,6 +66,7 @@
       <section id="view-explore" class="view-pane" role="tabpanel" aria-labelledby="tab-explore" hidden>
         <p class="pane-intro">从一片瓦，读懂一座楼。</p>
         <p class="pane-note">点选构件，或点击画面中的标记，靠近看一看。</p>
+        <div class="showcase-views" role="group" aria-label="近看鹳雀楼"><button id="showcase-front">楼前近景 <span>拾级望楼</span></button><button id="showcase-eaves">檐下细看 <span>柱廊与彩画</span></button></div>
         <button id="enter-walk" class="primary-button interior-entry">入楼漫游 · 楼层故事</button>
         <button id="interior-toggle" class="outline-button interior-entry" aria-pressed="false">打开九层内部结构</button>
         <div id="walk-panel" class="walk-panel" hidden>
@@ -77,7 +78,7 @@
           </div>
           <p id="walk-status" class="walk-status" role="status">拖动画面环视 · W A S D 或方向键行走</p>
           <button id="exit-walk" class="outline-button">返回结构剖视</button>
-          <p class="microcopy walk-scope">楼身六层到层讲故事，台基三层可查看结构说明。故事为导览主题编排，空间为示意。E 上楼，Q 下楼，Esc 退出。</p>
+          <p class="microcopy walk-scope">首层为数字主题展陈设计，空间与陈设为示意。楼身六层到层讲故事，台基三层可查看结构说明。E 上楼，Q 下楼，Esc 退出。</p>
         </div>
         <div id="interior-panel" class="interior-panel" hidden>
           <p class="interior-scope">结构示意 · 平面与部分层高推定</p>
@@ -268,6 +269,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button><a class="loading-reading" href="#reading-guide">先读建筑与楼层故事 ↗</a></div>
   <noscript><div class="no-script"><p>三维漫游需要启用 JavaScript。</p><a href="#reading-guide">打开图文游览，阅读建筑与楼层故事 ↗</a></div></noscript>
 
-  <script type="module" src="./assets/experience-v2.js?v=87f97292f95c"></script>
+  <script type="module" src="./assets/experience-v2.js?v=5ef72ba37c74"></script>
 </body>
 </html>
