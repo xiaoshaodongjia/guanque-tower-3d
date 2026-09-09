@@ -8,8 +8,8 @@
   <meta name="description" content="鹳雀凌云：沿黄河游览鹳雀楼，听声景、识斗拱、赏唐诗，收集六枚山河印章，留下自己的观景明信片。">
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
-  <base href="../">
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=fd333b5e5647">
+
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=b2cb53cdd152">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=0564c40b2b4b" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -77,6 +77,7 @@
             <div class="walk-pad" role="group" aria-label="楼内移动"><button data-walk-move="forward" aria-label="向前走">↑</button><button data-walk-move="left" aria-label="向左走">←</button><button data-walk-move="back" aria-label="向后走">↓</button><button data-walk-move="right" aria-label="向右走">→</button></div>
             <div class="walk-floor-actions"><div><button id="walk-down">下楼 ↓</button><button id="walk-up">上楼 ↑</button></div><button id="walk-story-again">重读本层故事</button><button id="walk-recenter">回到本层入口</button></div>
           </div>
+          <div id="walk-exhibit-menu" class="walk-exhibit-menu" hidden><p>首层三展 <span>点展项或选下方标题，读背后的故事</span></p><div role="group" aria-label="首层展项讲解"><button data-walk-exhibit="pufan" aria-pressed="false" aria-controls="walk-story" aria-label="阅读中都蒲坂繁盛图"><small>01</small>蒲坂繁盛</button><button data-walk-exhibit="defence" aria-pressed="false" aria-controls="walk-story" aria-label="阅读筑楼戍边"><small>02</small>筑楼戍边</button><button data-walk-exhibit="poets" aria-pressed="false" aria-controls="walk-story" aria-label="阅读旗亭画壁"><small>03</small>旗亭画壁</button></div></div>
           <p id="walk-status" class="walk-status" role="status">拖动画面环视 · W A S D 或方向键行走</p>
           <p class="microcopy walk-scope">大厅与回廊参考实景；尺寸、彩绘和壁画图像为示意。楼身六层到层讲故事，台基三层可查看结构说明。E 上楼，Q 下楼，Esc 退出。</p>
         </div>
@@ -192,10 +193,13 @@
     <div class="walk-story-reading">
     <button id="walk-close-story" class="close-panel" aria-label="收起楼层故事">×</button>
     <p id="walk-story-floor" class="eyebrow"></p><h2 id="walk-story-title" tabindex="-1"></h2><p id="walk-story-lead" class="detail-lead"></p><div id="walk-story-body"></div>
+    <figure id="walk-exhibit-figure" class="walk-exhibit-figure" hidden><canvas id="walk-exhibit-art"></canvas><figcaption>数字绘制 · 可对照下方现场图文阅读</figcaption></figure>
+    <div id="walk-exhibit-observations" class="walk-exhibit-observations" hidden></div>
     <button id="walk-read-story" class="outline-button" hidden>听本层故事</button><a id="walk-story-source" class="source-link" target="_blank" rel="noopener noreferrer">查阅故事依据 ↗</a>
+    <a id="walk-story-corroboration" class="source-link" target="_blank" rel="noopener noreferrer" hidden>《山西日报》展陈记述 ↗</a>
     <p id="walk-story-scope" class="microcopy">六层故事为数字导览主题编排，不代表真实展厅用途。</p>
     </div>
-    <div class="walk-story-actions"><button id="walk-continue" class="primary-button">读完了，继续漫游 →</button></div>
+    <div class="walk-story-actions"><div id="walk-exhibit-pagination" class="walk-exhibit-pagination" hidden><button id="walk-exhibit-prev" aria-label="阅读上一个展项">← 上一个</button><span id="walk-exhibit-counter"></span><button id="walk-exhibit-next" aria-label="阅读下一个展项">下一个 →</button></div><button id="walk-continue" class="primary-button">读完了，继续漫游 →</button></div>
   </aside>
   <aside id="detail-panel" class="detail-panel" aria-label="探索详情" hidden>
     <button class="close-panel" id="close-detail" aria-label="收起探索详情">×</button>
@@ -254,6 +258,10 @@
       <details><summary>楼身四层 · 重建，再续登临</summary><p>新的楼阁，回应久远的文化记忆。</p><p>据景区介绍，鹳雀楼于 1997 年 12 月启动重建，2002 年 9 月 26 日正式对外开放。今天眼前的楼阁，是这次现代复建的成果。</p><p>复建采用仿唐形制，把高台、柱列与层檐重新带到黄河岸边。它延续的是古楼与诗文的文化记忆，具体空间和工程构造属于现代建筑。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
       <details><summary>楼身五层 · 唐风与今工</summary><p>檐下的古意，来自今天的建造。</p><p>复建楼采用框架剪力墙结构，并组合预制与现浇的仿古混凝土构件。眼前的柱、枋、斗拱和层檐，以现代工程方法表现仿唐楼阁的建筑节奏。</p><p>施工方案记载，在楼身第五层平面处，外槽柱轴线向内移动 500 毫米。这一处明确的调整，让我们能把上部收敛的轮廓，与具体的建造尺寸联系起来。</p><a target="_blank" rel="noopener noreferrer" href="https://www.gc5.com/jzgc/jzsg/10190840.html">查阅故事依据 ↗</a></details>
       <details><summary>楼身六层 · 更上一层楼</summary><p>走到高处，再把目光交给山河。</p><p>楼身六层对应外观的第三层。包括台基与最高脊饰在内，复建楼总高 73.9 米；楼层地坪、屋顶和最高大吻，属于不同的高度基准。</p><p>这次数字登临，从台基与柱梁走到楼阁高处。回到“更上一层楼”，也可以把它读作一次不断拓展视野的邀请。此处故事与路线为数字导览编排，不表示真实开放区域。</p><a target="_blank" rel="noopener noreferrer" href="http://sxgql.com/?about/">查阅故事依据 ↗</a></details>
+      <h3>首层三展，走近看</h3><p>以下内容参考公开展陈图文整理，可与首层大厅中的数字展项对照阅读。</p>
+      <details><summary>中都蒲坂繁盛图 · 立体展陈 · 古城与渡口</summary><p>沿着城门、街巷与浮桥，读一座黄河岸边的城。</p><p>现场展项用立体城市场景表现唐代蒲州的繁盛。城郭、钟鼓楼、成片楼舍和往来人物共同组成叙事，唐玄宗东巡蒲坂是其中的一条情节线索。</p><p>蒲津渡连接黄河两岸。浮桥以舟船承托桥面，铁牛与系桥设施联系在一起；把目光从城内移向渡口，就能理解交通如何与城市生活相连。</p><p>数字展项将城门、街市、渡口和河岸古楼提炼为四组景物，可以在大厅侧面近看，也可以从二层回廊俯瞰。这里展示的是现场展项的主题与层次，古城道路、建筑数量和比例均作了简化。</p><ul><li>城门与中轴街道：穿过前方城门，视线沿街道通向后方的楼阁。</li><li>街市与院落：灰瓦院落、路边摊棚与人物，让城池有了日常生活。</li><li>浮桥与河岸：右侧以舟、桥、铁牛和河岸楼阁提示蒲津渡的交通主题。</li></ul><p>据 2022、2024 年公开展陈资料制作。城市场景为数字示意，布局、数量与尺寸不作原样复原承诺。</p><a target="_blank" rel="noopener noreferrer" href="http://cdcn.org.cn/article/28081">查看现场图文 · 中国社区发展网 ↗</a></details>
+      <details><summary>筑楼戍边 · 主题壁画 · 古楼来历</summary><p>在成为诗中的名楼之前，它先是一座用于瞭望的高楼。</p><p>公开展陈介绍将古鹳雀楼的起源，与北周宇文护镇守蒲州联系起来，并引唐人李瀚《河中鹳雀楼集序》中的筑楼记述。高处便于观察远方，是理解古楼早期军事用途的一条线索。</p><p>实拍壁画以将领、白马、军士、旌旗和楼阁组织画面。这里按这些可辨认的元素重绘主题图像，用人物与楼阁的关系提示“筑楼”与“戍守”，不为画中人物另编具体对话和事件。</p><p>古楼的来历与今天的复建建筑需要分开理解：你正在漫游的楼阁对应现代复建楼，壁画讲述的则是古楼的历史记忆。</p><ul><li>将领与白马：画面中央的骑乘人物提示军事主题。</li><li>楼阁与旌旗：楼的高度、军士与旗帜，联系起瞭望和戍守的用途。</li></ul><p>根据实拍中的主题元素作数字重绘，非原作复制。历史说明依据公开展陈介绍整理。</p><a target="_blank" rel="noopener noreferrer" href="http://cdcn.org.cn/article/28081">查看现场壁画与介绍 ↗</a></details>
+      <details><summary>旗亭画壁 · 文学典故 · 唐诗与歌声</summary><p>诗不只写在纸上，也曾随着歌声流传。</p><p>“旗亭画壁”见于唐人薛用弱《集异记》，讲王之涣、王昌龄、高适在酒肆听歌，以歌者演唱的诗篇相互比较诗名的故事。这是一则文学典故，不能把每个情节都当作已经证实的历史事实。</p><p>故事把诗人、酒案和歌者放进同一个场景，让人想到唐诗与音乐、交游之间的联系。数字画面参考现场壁画的红、蓝、青绿衣饰，安排三位诗人与下方的歌舞人物。</p><p>这组展项帮助游客认识王之涣的诗名。故事中的酒肆不被设定为鹳雀楼内；“旗亭画壁”与《登鹳雀楼》也不是同一次活动的记录。</p><ul><li>三位诗人与酒案：上方以三位人物和酒器表现听歌、交游的情境，不指定画中左右人物的身份。</li><li>歌乐与飘带：下方的乐器、舞姿和飘带，呼应诗歌可以被传唱的主题。</li></ul><p>文学典故据《集异记》相关介绍概述，未照用通俗改写中的诗目与比试细节。画面为数字重绘。</p><a target="_blank" rel="noopener noreferrer" href="http://cdcn.org.cn/article/28081">查看现场壁画与典故介绍 ↗</a></details>
       <h3>这座数字楼阁</h3><p>模型以实景照片和公开工程资料为依据。内部平面、部分标高和景区周边尺寸仍有推定，用于文化与结构展示。实际开放区域和现场路线以景区公布的信息为准。</p>
       <p class="reading-footer">鹳雀凌云 · 鹳雀楼数字化漫游</p>
     </div>
@@ -269,6 +277,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button><a class="loading-reading" href="#reading-guide">先读建筑与楼层故事 ↗</a></div>
   <noscript><div class="no-script"><p>三维漫游需要启用 JavaScript。</p><a href="#reading-guide">打开图文游览，阅读建筑与楼层故事 ↗</a></div></noscript>
 
-  <script type="module" src="./assets/experience-v2.js?v=fd333b5e5647"></script>
+  <script type="module" src="./assets/experience-v2.js?v=b2cb53cdd152"></script>
 </body>
 </html>
