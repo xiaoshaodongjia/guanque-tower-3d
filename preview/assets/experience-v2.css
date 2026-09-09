@@ -186,3 +186,36 @@
 .showcase-views button{padding:12px 10px;text-align:left;border:1px solid rgba(201,180,133,.28);background:rgba(201,180,133,.055);color:var(--text,#ece5d3);font:inherit;cursor:pointer}
 .showcase-views button span{display:block;margin-top:5px;font-size:11px;color:var(--muted,#a0aa9e)}
 .showcase-views button:hover,.showcase-views button:focus-visible{border-color:#bda573;background:rgba(201,180,133,.12)}
+
+/* Keep the hall in view while retaining movement, floor changes and an exit. */
+.walking .brand,.walking .brand-caption,.walking .view-tabs,
+.walking .tour-info,.walking .sidebar-footer,.walking .view-hint{display:none}
+.walking .sidebar{padding-top:22px}
+.walk-panel .section-heading{gap:10px;flex-wrap:wrap}
+.walk-view-actions{display:flex;gap:6px;margin-left:auto}
+.walk-view-actions button{min-height:38px;padding:7px 9px;border:1px solid var(--line);font:11px var(--sans);white-space:nowrap}
+#walk-fov[aria-pressed=true]{border-color:#c9b48585;color:var(--gold);background:#c9b48516}
+.walk-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 2px;font:11px var(--sans)}
+.walk-meta .microcopy{margin:0}.walk-meta a{font-size:11px;color:#a6b89f}
+@media(max-width:720px){
+  .walking #panel-toggle{display:block}
+  .walking .sidebar{padding:10px 12px;max-height:39dvh}
+  .walking .view-body{max-height:none}
+  .walk-panel .section-heading{gap:5px}
+  .walk-view-actions button{min-height:40px;padding-inline:8px;font-size:11px}
+  .walk-meta{margin-top:6px}
+  .sidebar-compact.walking .sidebar{max-height:none}
+  .sidebar-compact.walking .walk-panel>.interior-label,
+  .sidebar-compact.walking .walk-panel>select,
+  .sidebar-compact.walking .walk-meta,
+  .sidebar-compact.walking .walk-status,
+  .sidebar-compact.walking .walk-floor-actions>button{display:none}
+  .sidebar-compact.walking .walk-navigation{grid-template-columns:minmax(0,1fr)100px;gap:8px;margin:6px 0 0;align-items:center}
+  .sidebar-compact.walking .walk-pad{display:flex;gap:3px}
+  .sidebar-compact.walking .walk-pad button{flex:1;min-width:32px;max-width:64px;min-height:44px}
+  .sidebar-compact.walking [data-walk-move=left]{order:0}
+  .sidebar-compact.walking [data-walk-move=forward]{order:1}
+  .sidebar-compact.walking [data-walk-move=back]{order:2}
+  .sidebar-compact.walking [data-walk-move=right]{order:3}
+  .sidebar-compact.walking .walk-floor-actions button{min-height:44px}
+}
