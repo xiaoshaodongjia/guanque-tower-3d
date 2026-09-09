@@ -9,7 +9,7 @@
   <title>鹳雀凌云 · 鹳雀楼数字化漫游</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121b1a'/%3E%3Cpath d='M9 49h46M15 45h34M20 31v14m12-14v14m12-14v14M12 30l20-9 20 9M18 20l14-8 14 8' fill='none' stroke='%23c9b485' stroke-width='3'/%3E%3C/svg%3E">
   
-  <link rel="stylesheet" href="./assets/experience-v2.css?v=fb68f53ed578">
+  <link rel="stylesheet" href="./assets/experience-v2.css?v=fd333b5e5647">
   <script type="importmap">{"imports": {"three": "./assets/vendor/three.module.js", "three/addons/": "./assets/vendor/addons/"}}</script>
   <link data-online-preload rel="preload" as="fetch" href="./assets/guanque-fast.glb?v=0564c40b2b4b" crossorigin="anonymous" fetchpriority="high">
   <link data-online-preload rel="modulepreload" href="./assets/vendor/three.module.js">
@@ -70,15 +70,15 @@
         <button id="enter-walk" class="primary-button interior-entry">入楼漫游 · 楼层故事</button>
         <button id="interior-toggle" class="outline-button interior-entry" aria-pressed="false">打开九层内部结构</button>
         <div id="walk-panel" class="walk-panel" hidden>
-          <div class="section-heading"><strong id="walk-floor">楼身一层</strong><span id="walk-progress" class="microcopy">故事足迹 0 / 6</span></div>
+          <div class="section-heading"><strong id="walk-floor">楼身一层</strong><div class="walk-view-actions"><button id="walk-fov" aria-pressed="true" title="切换开阔视野与自然视野">开阔视野</button><button id="exit-walk">返回结构剖视</button></div></div>
+          <div class="walk-meta"><span id="walk-progress" class="microcopy">故事足迹 0 / 6</span><a id="walk-reference" href="https://zhuanlan.zhihu.com/p/193093280" target="_blank" rel="noopener noreferrer">大厅实景依据 ↗</a></div>
           <label class="interior-label" for="walk-storey">前往楼层</label><select id="walk-storey"></select>
           <div class="walk-navigation">
             <div class="walk-pad" role="group" aria-label="楼内移动"><button data-walk-move="forward" aria-label="向前走">↑</button><button data-walk-move="left" aria-label="向左走">←</button><button data-walk-move="back" aria-label="向后走">↓</button><button data-walk-move="right" aria-label="向右走">→</button></div>
             <div class="walk-floor-actions"><div><button id="walk-down">下楼 ↓</button><button id="walk-up">上楼 ↑</button></div><button id="walk-story-again">重读本层故事</button><button id="walk-recenter">回到本层入口</button></div>
           </div>
           <p id="walk-status" class="walk-status" role="status">拖动画面环视 · W A S D 或方向键行走</p>
-          <button id="exit-walk" class="outline-button">返回结构剖视</button>
-          <p class="microcopy walk-scope">首层为数字主题展陈设计，空间与陈设为示意。楼身六层到层讲故事，台基三层可查看结构说明。E 上楼，Q 下楼，Esc 退出。</p>
+          <p class="microcopy walk-scope">大厅与回廊参考实景；尺寸、彩绘和壁画图像为示意。楼身六层到层讲故事，台基三层可查看结构说明。E 上楼，Q 下楼，Esc 退出。</p>
         </div>
         <div id="interior-panel" class="interior-panel" hidden>
           <p class="interior-scope">结构示意 · 平面与部分层高推定</p>
@@ -269,6 +269,6 @@
   <div id="loading" role="status"><p class="eyebrow">黄河东岸 · 一场数字登临</p><h2 class="loading-title">鹳雀凌云</h2><div class="loading-line"></div><p id="loading-message">正在铺展楼阁与山河</p><button id="retry" class="outline-button" hidden>重新加载</button><a class="loading-reading" href="#reading-guide">先读建筑与楼层故事 ↗</a></div>
   <noscript><div class="no-script"><p>三维漫游需要启用 JavaScript。</p><a href="#reading-guide">打开图文游览，阅读建筑与楼层故事 ↗</a></div></noscript>
   
-  <script type="module" src="./assets/experience-v2.js?v=fb68f53ed578"></script>
+  <script type="module" src="./assets/experience-v2.js?v=fd333b5e5647"></script>
 </body>
 </html>

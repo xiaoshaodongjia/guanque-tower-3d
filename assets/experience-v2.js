@@ -1,9 +1,9 @@
 // Static hosting uses relative URLs; the standalone edition embeds its model and audio.
 // Model/audio cache keys depend only on their own bytes, never on a UI edit.
-const ASSET_VERSIONS = {"guanque-fast.glb":"0564c40b2b4b","guanque-exploration.glb":"8e58e122e4d5","guanque-interior.glb":"f194be33ffe7","guanque-surroundings.glb":"03e9f89a11ac","audio/day.mp3":"49cd0b8c980b","audio/dusk.mp3":"6454c5fa922a","audio/part-bracket.mp3":"cb7869e37867","audio/part-column.mp3":"70b699446320","audio/part-podium.mp3":"1117c120b770","audio/part-ridge.mp3":"b3476ebc6869","audio/part-tile.mp3":"5b4bf3bd5fa1","audio/poem-0.mp3":"8fec4ef4aa5d","audio/poem-1.mp3":"d26aed6c7370","audio/poem-2.mp3":"68180cf8b284","audio/poem-3.mp3":"74b1c47f992a","audio/river.mp3":"9d19e6affa7e","audio/scene-0.mp3":"d6f137606103","audio/scene-1.mp3":"33e97dd0dad1","audio/scene-2.mp3":"47bd9556f9fc","audio/scene-3.mp3":"4d091c123093","audio/wind.mp3":"4aa2ff8d4ce0"};
+const ASSET_VERSIONS = {"guanque-fast.glb":"0564c40b2b4b","guanque-exploration.glb":"8e58e122e4d5","guanque-interior.glb":"c0fcb0c9832d","guanque-surroundings.glb":"03e9f89a11ac","audio/day.mp3":"49cd0b8c980b","audio/dusk.mp3":"6454c5fa922a","audio/part-bracket.mp3":"cb7869e37867","audio/part-column.mp3":"70b699446320","audio/part-podium.mp3":"1117c120b770","audio/part-ridge.mp3":"b3476ebc6869","audio/part-tile.mp3":"5b4bf3bd5fa1","audio/poem-0.mp3":"8fec4ef4aa5d","audio/poem-1.mp3":"d26aed6c7370","audio/poem-2.mp3":"68180cf8b284","audio/poem-3.mp3":"74b1c47f992a","audio/river.mp3":"9d19e6affa7e","audio/scene-0.mp3":"d6f137606103","audio/scene-1.mp3":"33e97dd0dad1","audio/scene-2.mp3":"47bd9556f9fc","audio/scene-3.mp3":"4d091c123093","audio/wind.mp3":"4aa2ff8d4ce0"};
 const MODEL_ASSETS = {"fast":{"path":"guanque-fast.glb","bytes":8881776},"fine":{"path":"guanque-exploration.glb","bytes":21294552}};
 const ARCHITECTURE = {"revision":"engineering-reference-2026-09-06","units":"metres","totalHeight":73.9,"entranceElevation":16.5,"knownStructuralElevations":{"main4":38.13,"main5":47.73},"podiumStoreys":3,"mainStoreys":6,"visibleStoreys":[1,4,6],"elevationFrom":[0.0,18.8,41.2,75.47432708740234],"elevationTo":[0.0,16.5,38.13,73.9],"outerColumnDiameters":[1.0,0.85,0.75,0.7],"innerColumnDiameters":[1.2,1.1,1.0,0.9],"fifthStoreyAxisInset":0.5,"extent":"Exterior reference model; no measured interior plan. Missing levels and plan dimensions are not asserted.","sources":["http://sxgql.com/?about/","https://www.gc5.com/jzgc/jzsg/10190840.html","http://123.57.212.98/html/tm/29/38/69/content/1433.html"]};
-const INTERIOR = {"revision":"interior-schematic-2026-09-06","units":"metres","storeys":[{"id":"p1","label":"台基一层","z":0.9,"known":true,"source":"施工正文：底层室内地坪相对首层 −15.60 m。","width":62,"depth":44,"index":0,"relativeZ":-15.6,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p2","label":"台基二层","z":6.1,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":62,"depth":44,"index":1,"relativeZ":-10.4,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p3","label":"台基三层","z":11.3,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":60,"depth":42,"index":2,"relativeZ":-5.2,"height":5.2,"planConfidence":"estimated","columnCount":null,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m1","label":"楼身一层","z":16.5,"known":true,"source":"施工正文：±0.00 为楼身首层室内地坪，周边地面为 −16.50 m。","width":35,"depth":24,"index":3,"relativeZ":0.0,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m2","label":"楼身二层","z":23.71,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":35,"depth":24,"index":4,"relativeZ":7.21,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m3","label":"楼身三层","z":30.92,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":32,"depth":22,"index":5,"relativeZ":14.42,"height":7.21,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m4","label":"楼身四层","z":38.13,"known":true,"source":"施工正文：第四层结构范围从相对首层 +21.63 m 开始。","width":29,"depth":20,"index":6,"relativeZ":21.63,"height":9.6,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m5","label":"楼身五层","z":47.73,"known":true,"source":"施工正文：第五层起点相对首层 +31.23 m；外槽柱轴线在本层内移 0.50 m。","width":28,"depth":19,"index":7,"relativeZ":31.23,"height":5.95021,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m6","label":"楼身六层","z":53.68021,"known":false,"source":"施工正文确认其对应外观第三层；本层高度沿用已校正的照片模型。","width":26,"depth":16,"index":8,"relativeZ":37.18021,"height":7.41979,"planConfidence":"estimated","columnCount":20,"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"}],"scope":"结构示意：楼层总数和部分标高有施工资料支持；平面、部分层高、楼梯及电梯尺寸推定。","supported":["台基三层、楼身六层","楼身 20 根内柱：12 根结合两处楼梯间剪力墙，8 根独立","台基方柱、楼身圆柱","楼身 4–5、8–9 轴与 E–G 轴间设楼梯、电梯及剪力墙","内柱直径 1.20、1.10、1.00、0.90 m 的变径序列"],"estimated":["全部水平轴线间距与楼板轮廓","台基二、三层与楼身二、三、六层标高","柱径变更与楼面标高的简化对应","两侧交通区的绝对位置、剪力墙厚度、梯段与井道尺寸"],"notModeled":["当前展陈和房间用途","全部实际楼梯、电梯数量及精确平面","钢筋与机电管线"],"sources":["https://www.gc5.com/jzgc/jzsg/10190840.html","http://shigongdaquan.max.book118.com/01.公共设施施工组织设计/某楼复建工程施工组织设计方案.htm"],"bytes":2931836,"triangles":34176,"meshes":61};
+const INTERIOR = {"revision":"interior-hall-reference-2026-09-09","units":"metres","storeys":[{"id":"p1","label":"台基一层","z":0.9,"known":true,"source":"施工正文：底层室内地坪相对首层 −15.60 m。","width":62,"depth":44,"index":0,"relativeZ":-15.6,"height":5.2,"planConfidence":"estimated","columnCount":null,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0],[-24,-16],[-24,0],[-24,16],[24,-16],[24,0],[24,16],[0,-16],[0,16]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p2","label":"台基二层","z":6.1,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":62,"depth":44,"index":1,"relativeZ":-10.4,"height":5.2,"planConfidence":"estimated","columnCount":null,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0],[-24,-16],[-24,0],[-24,16],[24,-16],[24,0],[24,16],[0,-16],[0,16]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"p3","label":"台基三层","z":11.3,"known":false,"source":"缺该层标高，暂将台基内部高度三等分。","width":60,"depth":42,"index":2,"relativeZ":-5.2,"height":5.2,"planConfidence":"estimated","columnCount":null,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0],[-24,-16],[-24,0],[-24,16],[24,-16],[24,0],[24,16],[0,-16],[0,16]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m1","label":"楼身一层","z":16.5,"known":true,"source":"施工正文：±0.00 为楼身首层室内地坪，周边地面为 −16.50 m。","width":35,"depth":24,"index":3,"relativeZ":0.0,"height":7.21,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m2","label":"楼身二层","z":23.71,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":35,"depth":24,"index":4,"relativeZ":7.21,"height":7.21,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[{"x":0,"z":0,"width":10,"depth":12.6,"guard":0.18,"confidence":"estimated"}],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m3","label":"楼身三层","z":30.92,"known":false,"source":"缺该层标高，暂将首层至第四层的高度三等分。","width":32,"depth":22,"index":5,"relativeZ":14.42,"height":7.21,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m4","label":"楼身四层","z":38.13,"known":true,"source":"施工正文：第四层结构范围从相对首层 +21.63 m 开始。","width":29,"depth":20,"index":6,"relativeZ":21.63,"height":9.6,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m5","label":"楼身五层","z":47.73,"known":true,"source":"施工正文：第五层起点相对首层 +31.23 m；外槽柱轴线在本层内移 0.50 m。","width":28,"depth":19,"index":7,"relativeZ":31.23,"height":5.95021,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"},{"id":"m6","label":"楼身六层","z":53.68021,"known":false,"source":"施工正文确认其对应外观第三层；本层高度沿用已校正的照片模型。","width":26,"depth":16,"index":8,"relativeZ":37.18021,"height":7.41979,"planConfidence":"estimated","columnCount":20,"columns":[[-12,-7],[-12,0],[-12,7],[-8,-7],[-8,0],[-8,7],[8,-7],[8,0],[8,7],[12,-7],[12,0],[12,7],[-4,-7],[-4,7],[0,-7],[0,7],[4,-7],[4,7],[-5.6,0],[5.6,0]],"voids":[],"note":"楼板轮廓、厚度、柱位、交通区尺寸和梯段均为示意；不代表真实房间布局。"}],"atrium":{"x":0,"z":0,"width":10,"depth":12.6,"guard":0.18,"confidence":"estimated","floor":3,"gallery":4,"ceiling":5},"scope":"结构示意：楼层总数和部分标高有施工资料支持；首层通高大厅、二层回廊参考实拍与施工文字，洞口、柱网、平面及部分层高仍为推定。","supported":["台基三层、楼身六层","楼身 20 根内柱：12 根结合两处楼梯间剪力墙，8 根独立","台基方柱、楼身圆柱","楼身 4–5、8–9 轴与 E–G 轴间设楼梯、电梯及剪力墙","内柱直径 1.20、1.10、1.00、0.90 m 的变径序列","首层大厅与二层回廊相通：实拍俯视照片；施工文字提及二层回廊和一层洞口"],"estimated":["全部水平轴线间距与楼板轮廓","台基二、三层与楼身二、三、六层标高","柱径变更与楼面标高的简化对应","两侧交通区的绝对位置、剪力墙厚度、梯段与井道尺寸","首层上方洞口长宽、回廊宽度、内柱平面位置与彩绘细节"],"notModeled":["全部实际房间用途与最新展陈","全部实际楼梯、电梯数量及精确平面","钢筋与机电管线"],"sources":["https://www.gc5.com/jzgc/jzsg/10190840.html","http://shigongdaquan.max.book118.com/01.公共设施施工组织设计/某楼复建工程施工组织设计方案.htm","https://zhuanlan.zhihu.com/p/193093280","https://www.nipic.com/show/33713653.html"],"bytes":3387240,"triangles":39536,"meshes":62};
 const FLOOR_STORIES = [{"id":"p1","title":"把高楼托在地面之上","lead":"脚下的高台，也是楼阁的一部分。","paragraphs":["外面看去厚重的台基，内部实际分成三层。施工正文将台基底层地坪记为首层地坪以下 15.60 米；按周边地面换算，这里约为地面以上 0.90 米。","数字导览从柱、梁与楼板之间，带你认识高台的内部空间。眼前的柱位、洞口和交通区仍是结构示意，不能据此判断真实设备或展厅的位置。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"外面厚重的高台，内部也有三层空间。这里是台基一层。柱、梁与楼板共同托起楼阁；眼前的布局，是依据公开施工资料制作的结构示意。","kind":"structure","audio":null},{"id":"p2","title":"高台里的三重空间","lead":"外观的一座高台，藏着内部的层次。","paragraphs":["鹳雀楼的内部楼层，不能只靠数屋檐来判断。台基内部三层与楼身六层合在一起，构成这次数字导览的九个层次。","这一层的确切标高尚缺完整图纸，模型暂按台基高度区间等分。沿着同一套柱、梁与楼板向上看，可以理解中空高台如何组织空间。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"来到台基二层，试着把目光从楼板移向柱列。外观的一座高台，内部还有三重空间。这里的层高暂作推定，帮助我们理解楼阁从下到上的结构关系。","kind":"structure","audio":null},{"id":"p3","title":"从高台走向楼阁","lead":"登临，先从高度的变化开始。","paragraphs":["从周边地面到楼身首层地坪，高差约 16.5 米。外部的石阶与月台，把这段高度转化为拾级而上的登临体验。","台基三层位于这段过渡的上部。继续上楼，就进入楼身一层。数字漫游把内外两种登临方式联系起来，具体梯段与楼层衔接仍待完整 CAD 核对。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"从周边地面到楼身首层，高差约十六点五米。石阶与月台，让登楼成为一步步展开的过程。再向上一层，我们便从高台走入楼身。","kind":"structure","audio":null},{"id":"m1","title":"河畔起高楼","lead":"从这一层，先听古楼的来处。","paragraphs":["据景区介绍，鹳雀楼始建于北周，最初具有军事戍楼的用途，因鹳雀常来栖息而得名。楼临黄河、远望中条，地理位置与登临视野一起构成了它的记忆。","眼前的三维模型表现的是现代复建楼。复建工程于 1997 年启动，2002 年开放；古楼的故事，借新的建筑空间继续被人们讲述。"],"source":"http://sxgql.com/?about/","narration":"欢迎走进楼身一层。鹳雀楼的故事，从黄河岸边开始。据景区介绍，古楼始建于北周，因鹳雀时常栖息而得名。今天看到的，是一九九七年启动重建、二零零二年开放的复建楼。","kind":"story","audio":null},{"id":"m2","title":"二十字里的山河","lead":"一首短诗，把登临写成了千年的记忆。","paragraphs":["“白日依山尽，黄河入海流。欲穷千里目，更上一层楼。”王之涣的《登鹳雀楼》只有四句二十字，却把落日、大河与登高的动作连在了一起。","前两句展开眼前山河，后两句把视线引向更远的地方。此层的数字主题从诗意出发，不代表这里真实设有某一座诗歌展厅。"],"source":"http://sxgql.com/?about/","narration":"白日依山尽，黄河入海流。欲穷千里目，更上一层楼。四句二十字，从眼前的山河，写到更远的视野。来到这一层，让我们先停一步，再读这首熟悉的唐诗。","kind":"story","audio":null},{"id":"m3","title":"楼隐，诗传","lead":"建筑曾经消失，登临的记忆仍在。","paragraphs":["据景区介绍，古鹳雀楼曾毁于战火，此后长期未获重建。这里不把今天的复建楼当成从古代原样留存的建筑。","楼可以隐去，诗却一代代传下来。《登鹳雀楼》让黄河岸边的登临经验越过时间，也让后来的重建有了人们熟悉的文化记忆。"],"source":"http://sxgql.com/?about/","narration":"古鹳雀楼曾毁于战火，此后长期未获重建。楼可以隐去，诗却一代代传下来。黄河岸边的登临记忆，因这首唐诗延续至今。","kind":"story","audio":null},{"id":"m4","title":"重建，再续登临","lead":"新的楼阁，回应久远的文化记忆。","paragraphs":["据景区介绍，鹳雀楼于 1997 年 12 月启动重建，2002 年 9 月 26 日正式对外开放。今天眼前的楼阁，是这次现代复建的成果。","复建采用仿唐形制，把高台、柱列与层檐重新带到黄河岸边。它延续的是古楼与诗文的文化记忆，具体空间和工程构造属于现代建筑。"],"source":"http://sxgql.com/?about/","narration":"一九九七年十二月，鹳雀楼启动重建。二零零二年九月二十六日，复建楼正式对外开放。新的楼阁以仿唐形制，回应古楼与诗文留下的文化记忆。","kind":"story","audio":null},{"id":"m5","title":"唐风与今工","lead":"檐下的古意，来自今天的建造。","paragraphs":["复建楼采用框架剪力墙结构，并组合预制与现浇的仿古混凝土构件。眼前的柱、枋、斗拱和层檐，以现代工程方法表现仿唐楼阁的建筑节奏。","施工方案记载，在楼身第五层平面处，外槽柱轴线向内移动 500 毫米。这一处明确的调整，让我们能把上部收敛的轮廓，与具体的建造尺寸联系起来。"],"source":"https://www.gc5.com/jzgc/jzsg/10190840.html","narration":"仿古的外观之下，是现代的框架剪力墙结构。柱、枋、斗拱与层檐，共同表现仿唐楼阁的节奏。在楼身五层，外槽柱轴线向内移动半米，把具体尺寸与楼阁轮廓联系起来。","kind":"story","audio":null},{"id":"m6","title":"更上一层楼","lead":"走到高处，再把目光交给山河。","paragraphs":["楼身六层对应外观的第三层。包括台基与最高脊饰在内，复建楼总高 73.9 米；楼层地坪、屋顶和最高大吻，属于不同的高度基准。","这次数字登临，从台基与柱梁走到楼阁高处。回到“更上一层楼”，也可以把它读作一次不断拓展视野的邀请。此处故事与路线为数字导览编排，不表示真实开放区域。"],"source":"http://sxgql.com/?about/","narration":"我们来到楼身六层，这里对应外观的第三层。从高台、柱梁，到层檐与屋顶，楼阁的关系在一路登临中逐渐清晰。更上一层楼，也是在邀请我们，把目光放得更远。","kind":"story","audio":null}];
 const SCENIC_PARK = {"revision":"aerial-reference-2026-09-07","units":"metres","confidence":"schematic","scope":"入口至主楼核心游线的实景关系参考模型；水平尺寸、树木与附属建筑细节为示意。","layoutBasis":"遵循用户确认：卫星截图校正平面相对位置，实景航拍参考门楼、廊房与树群；概念图只存档。","sequence":["前广场与假山水景","门楼及两翼廊房","园内景观湖与中轴桥","登楼步道与开敞节点","环楼广场与鹳雀楼"],"supported":["实景入口—鹳影湖桥—圆形广场—主楼的前后顺序","卫星图可见的双翼状湖岸","中央门楼、侧门和低矮廊房","高台周围的铺装广场","卫星图左侧的大地诗景，用户确认是王之涣的诗","入口侧停车区"],"estimated":["全部周边水平尺寸与绝对朝向","园路细节与被遮挡部分","树种、树位和附属建筑细部","湖岸轮廓与桥的具体尺寸"],"notClaimed":["完整 2.064 平方公里景区测绘复原","概念总平面等同于当前建设现状","园内景观湖等同于黄河"],"sources":[{"title":"用户提供：入口至主楼航拍（画面带新华社标识）","local":"work/references/鹳雀楼_入口至主楼航拍_用户提供_26f6e3d4.png"},{"title":"用户提供：门区与鹳影湖卫星截图","local":"work/references/鹳雀楼_门区鹳影湖卫星参考_用户提供_20260907.png"},{"title":"用户提供：主轴、主楼和左侧大地诗景卫星截图","local":"work/references/鹳雀楼_主轴与大地诗景卫星参考_用户提供_20260907.png"},{"title":"永济市政府：鹳雀楼景区","url":"http://www.yongji.gov.cn/doc/2024/07/01/458531.shtml"},{"title":"景区官方实景图库","url":"http://sxgql.com/?tupian/52.html"},{"title":"用户提供：景区概念总平面","local":"work/references/鹳雀楼_景区概念总平面_用户提供_20260907.png","role":"archive-only"}],"waypoints":[{"id":"overview","title":"景区总览","subtitle":"由入口望向鹳雀楼","position":[360,365,775],"target":[-27,8,218],"text":"沿航拍可见的主轴，把门区、湖桥、步道与高台连成一段完整的登临。"},{"id":"forecourt","title":"前广场","subtitle":"假山水景 · 入园起点","position":[70,44,521],"target":[0,6,403],"text":"前广场中央的假山水景与门楼形成前后层次，两翼的低矮廊房把视线引向中轴。"},{"id":"gate","title":"门楼与廊房","subtitle":"中央门楼 · 两翼展开","position":[43,24,439],"target":[0,6,394],"text":"中央门楼、左右侧门和两翼廊房参考实景形制，门洞、屋顶和木构细节作适度简化。"},{"id":"lake","title":"鹳影湖","subtitle":"双翼湖岸 · 中轴过桥","position":[105,87,389],"target":[0,2,320],"text":"门后是横向展开的园内景观湖。中轴桥跨过水面，岸边园路与树群沿曲线展开。"},{"id":"axis","title":"圆形广场","subtitle":"主轴步道 · 几何草坪","position":[87,106,261],"target":[0,5,178],"text":"中央步道连接圆形广场与四周的几何绿地。位置关系按卫星截图校正，尺度为照片估计。"},{"id":"poem","title":"大地诗景","subtitle":"王之涣 · 登鹳雀楼","position":[-210,170,-10],"target":[-214,0,54],"text":"白日依山尽，黄河入海流。欲穷千里目，更上一层楼。主楼侧方的地景文字参考你提供的卫星图，字体与种植细节为示意。"},{"id":"tower","title":"高台前庭","subtitle":"环楼广场 · 接续入楼","position":[103,70,154],"target":[0,32,8],"text":"环楼铺装把周围绿地与高台分开。从这里可以切入楼内漫游，逐层阅读六段故事。"}],"route":["forecourt","gate","lake","axis","poem","tower"],"bytes":4140924,"gzipBytes":1634020,"triangles":106164,"meshes":46,"trees":406,"bounds":[[-227.8249969482422,-0.07000000029802322,-122.35275268554688],[306.95001220703125,15.605109214782715,507.32501220703125]],"footprint":[[-227.8249969482422,417.0],[-150.0,-73.0],[-145.56300354003906,-78.1500015258789],[-143.57899475097656,-79.28099822998047],[227.51600646972656,-121.66600036621094],[242.45599365234375,-122.35299682617188],[256.4809875488281,-121.52899932861328],[269.1289978027344,-118.76599884033203],[279.9010009765625,-113.56999969482422],[288.093994140625,-105.49800109863281],[294.0069885253906,-93.98200225830078],[298.7049865722656,-78.99199676513672],[302.322998046875,-61.150001525878906],[304.89599609375,-41.143001556396484],[306.43701171875,-19.684999465942383],[306.95001220703125,2.5],[306.43701171875,24.684999465942383],[304.89599609375,46.143001556396484],[302.322998046875,66.1500015258789],[298.7049865722656,83.99199676513672],[294.0069885253906,98.98200225830078],[157.0,507.32501220703125],[-224.0,507.32501220703125],[-227.8249969482422,503.0]]};
 let embeddedAudioMap;
@@ -160,6 +160,7 @@ const visitorExperience = (() => {
     get reducedMotion() { return reduced(); },
     get covered() { return covered(); },
     expandPanel() { setCompact(false); },
+    collapsePanel() { setCompact(true); },
     connect(callbacks) {
       hooks = callbacks;
       updateMotion();
@@ -541,154 +542,295 @@ class Soundscape {
   }
 }
 
-// Digital exhibition design for the first main storey, not a survey of its exhibits.
-// The same footprints drive geometry and walking collision, in metres (Y up).
+// Hall and gallery follow the cited photographs, with estimated dimensions.
+// Murals are original diagrammatic drawings, not scans of third-party artwork.
+// These footprints drive both furnishings and walking collision, in metres.
 const FIRST_FLOOR_EXHIBITS = [
-  { id: 'welcome', x: 3.4, z: -2.4, w: 4.8, h: 3.5, d: .28, foot: .72, yaw: 0 },
-  { id: 'origin', x: -4.9, z: 2.6, w: 1.85, h: 2.8, d: .18, foot: .62, yaw: .22 },
-  { id: 'poem', x: 5.95, z: 2.6, w: 1.85, h: 2.8, d: .18, foot: .62, yaw: -.22 },
-  { id: 'bench-west', x: -4.8, z: -2.8, w: 2.2, h: .46, d: .68, foot: .68, yaw: 0, bench: true },
-  { id: 'bench-east', x: 5, z: 5, w: 2.2, h: .46, d: .68, foot: .68, yaw: 0, bench: true }
+  { id:'pufan', x:-7.12, z:0, w:11.35, h:3.35, d:.38, foot:1.42, yaw:Math.PI/2, base:.72, type:'panorama', title:'中都蒲坂繁盛图' },
+  { id:'defence', x:-4.1, z:-9.8, w:5.6, h:4.25, d:.24, foot:.46, yaw:0, base:.46, type:'relief', title:'筑楼戍边' },
+  { id:'poets', x:4.1, z:-9.8, w:5.6, h:4.25, d:.24, foot:.46, yaw:0, base:.46, type:'relief', title:'旗亭画壁' },
+  { id:'couplet', x:7.58, z:-3.5, w:3.0, h:4.7, d:.16, foot:.28, yaw:-Math.PI/2, base:.42, type:'couplet', title:'一楼楹联' },
+  { id:'hall-guide', x:-6.0, z:8.8, w:1.05, h:.98, d:.20, foot:.58, yaw:.25, base:.10, type:'guide', title:'走进首层大厅' },
+  { id:'poem-guide', x:6.0, z:8.8, w:1.05, h:.98, d:.20, foot:.58, yaw:-.25, base:.10, type:'guide', title:'登鹳雀楼' },
+  { id:'bench-west', x:-6.2, z:-7.95, w:2.15, h:.46, d:.58, foot:.58, yaw:0, bench:true },
+  { id:'bench-east', x:6.2, z:7.95, w:2.15, h:.46, d:.58, foot:.58, yaw:0, bench:true }
 ];
 
-function firstFloorExhibitsCanStand(x, z, radius = .28) {
-  return FIRST_FLOOR_EXHIBITS.every(item => {
-    const dx=x-item.x, dz=z-item.z, c=Math.cos(item.yaw), s=Math.sin(item.yaw);
-    const lx=c*dx-s*dz, lz=s*dx+c*dz;
-    return Math.hypot(Math.max(0,Math.abs(lx)-(item.w+.12)/2), Math.max(0,Math.abs(lz)-item.foot/2)) >= radius;
+function firstFloorExhibitsCanStand(x,z,radius=.28) {
+  return FIRST_FLOOR_EXHIBITS.every(item=>{
+    const dx=x-item.x,dz=z-item.z,c=Math.cos(item.yaw),s=Math.sin(item.yaw);
+    const lx=c*dx-s*dz,lz=s*dx+c*dz;
+    return Math.hypot(Math.max(0,Math.abs(lx)-(item.w+.12)/2),Math.max(0,Math.abs(lz)-item.foot/2))>=radius;
   });
 }
 
-function prepareFirstFloorMaterial(THREE, object, shell) {
-  const { storey, kind }=object.userData;
-  const ceiling=storey===4 && kind.startsWith('floor-');
-  if (storey!==3 && !ceiling) return null;
-  const sourceNames={ column:'立柱 · 朱漆仿木混凝土', stair:'石材 · 灰石铺地' };
-  const sourceName=kind.startsWith('floor-')&&!ceiling ? '石材 · 灰石铺地' : sourceNames[kind];
-  let source;
-  if (sourceName) shell.traverse(mesh => {
-    if(!mesh.isMesh)return;
-    for(const material of Array.isArray(mesh.material)?mesh.material:[mesh.material]) if(material.name===sourceName)source=material;
-  });
-  const colors={ column:'#805441', beam:'#624b3c', wall:'#bdb4a2', rail:'#64553e', shaft:'#62776f', stair:'#aaa79c' };
-  const material=source ? source.clone() : new THREE.MeshStandardMaterial({color:ceiling?'#beb7a5':colors[kind]||'#aaa79c',roughness:.86});
-  material.side=THREE.FrontSide; material.clippingPlanes=null;
-  material.clipIntersection=false; material.polygonOffset=false;
-  const geometry=object.geometry, positions=geometry.attributes.position, normal=geometry.attributes.normal;
-  const uv=new Float32Array(positions.count*2);
-  const centers=[...[-12,-8,8,12].flatMap(x=>[-7,0,7].map(z=>[x,z])),...[-4,0,4].flatMap(x=>[-7,7].map(z=>[x,z])),[0,-2.6],[0,2.6]];
+function hallCanvasTexture(THREE,width,height,draw,repeat=false) {
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+  draw(canvas.getContext('2d'),width,height);
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;
+  if(repeat)texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+  return texture;
+}
+
+let firstHallPalette;
+function getFirstHallPalette(THREE) {
+  if(firstHallPalette)return firstHallPalette;
+  const paving=hallCanvasTexture(THREE,768,768,(ctx,w,h)=>{
+    ctx.fillStyle='#898c88';ctx.fillRect(0,0,w,h);
+    for(let row=0;row<4;row++)for(let col=0;col<4;col++){
+      const x=col*192+1.5,y=row*192+1.5,tone=179+((row*7+col*11)%13);
+      const gradient=ctx.createLinearGradient(x,y,x+190,y+190);
+      gradient.addColorStop(0,'rgb('+[tone+9,tone+10,tone+5].join(',')+')');
+      gradient.addColorStop(1,'rgb('+[tone,tone+2,tone-2].join(',')+')');
+      ctx.fillStyle=gradient;ctx.fillRect(x,y,189,189);
+      ctx.strokeStyle='#d1d1c7';ctx.lineWidth=1;ctx.strokeRect(x+1,y+1,187,187);
+      ctx.strokeStyle='rgba(95,103,98,.045)';ctx.lineWidth=1.4;
+      for(let k=0;k<9;k++){
+        ctx.beginPath();ctx.moveTo(x+7,y+10+k*19);
+        ctx.bezierCurveTo(x+56,y+k*19,x+122,y+22+k*19,x+180,y+12+k*19);ctx.stroke();
+      }
+    }
+  },true);
+  const painted=hallCanvasTexture(THREE,1024,256,(ctx,w,h)=>{
+    ctx.fillStyle='#6d292d';ctx.fillRect(0,0,w,h);
+    for(const [y,height,color] of [[0,14,'#eee6ce'],[14,16,'#2d6b78'],[30,7,'#d3bc7d'],[219,7,'#d3bc7d'],[226,16,'#2d6b78'],[242,14,'#eee6ce']]){
+      ctx.fillStyle=color;ctx.fillRect(0,y,w,height);
+    }
+    for(const x of [256,768]){
+      ctx.beginPath();ctx.moveTo(x-209,128);ctx.lineTo(x-147,58);ctx.lineTo(x+147,58);ctx.lineTo(x+209,128);ctx.lineTo(x+147,198);ctx.lineTo(x-147,198);ctx.closePath();
+      ctx.fillStyle='#277783';ctx.fill();ctx.lineWidth=7;ctx.strokeStyle='#eee5c9';ctx.stroke();
+      ctx.strokeStyle='#284a82';ctx.lineWidth=4;ctx.stroke();
+      for(let k=0;k<8;k++){
+        ctx.save();ctx.translate(x,128);ctx.rotate(k*Math.PI/4);
+        ctx.beginPath();ctx.ellipse(0,36,14,29,0,0,Math.PI*2);ctx.fillStyle=k%2?'#688b73':'#afbf92';ctx.fill();ctx.strokeStyle='#ebdab1';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+      }
+      ctx.beginPath();ctx.arc(x,128,18,0,Math.PI*2);ctx.fillStyle='#cfac68';ctx.fill();
+    }
+  },true);
+  const coffer=hallCanvasTexture(THREE,512,512,(ctx,w,h)=>{
+    ctx.fillStyle='#285d64';ctx.fillRect(0,0,w,h);
+    for(const [inset,color,line] of [[13,'#e4d4a8',9],[29,'#904138',14],[45,'#e5dcb8',4],[72,'#527e75',22]]){
+      ctx.strokeStyle=color;ctx.lineWidth=line;ctx.strokeRect(inset,inset,w-inset*2,h-inset*2);
+    }
+    for(let k=0;k<12;k++){
+      ctx.save();ctx.translate(256,256);ctx.rotate(k*Math.PI/6);
+      ctx.beginPath();ctx.ellipse(0,75,26,75,0,0,Math.PI*2);ctx.fillStyle=k%2?'#afbf91':'#6f9b8a';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#e0cf9c';ctx.stroke();ctx.restore();
+    }
+    ctx.beginPath();ctx.arc(256,256,42,0,Math.PI*2);ctx.fillStyle='#923c36';ctx.fill();ctx.lineWidth=6;ctx.strokeStyle='#c9b078';ctx.stroke();
+  },true);
+  firstHallPalette={paving,painted,coffer};return firstHallPalette;
+}
+
+function prepareFirstFloorMaterial(THREE,object,shell) {
+  const {storey,kind}=object.userData;
+  const ceiling=storey===5&&kind.startsWith('floor-');
+  if(![3,4].includes(storey)&&!ceiling)return null;
+  const palette=getFirstHallPalette(THREE);
+  const colors={column:'#702b2d',beam:'#ffffff',wall:'#d4d1c5',rail:'#67564b','gallery-rail':'#c8d8cd',shaft:'#777b75',stair:'#b7b8af'};
+  const material=new THREE.MeshStandardMaterial({color:ceiling?'#d8dcc8':colors[kind]||'#ffffff',roughness:kind==='column'?.31:.72});
+  if(kind.startsWith('floor-')){material.map=ceiling?palette.coffer:palette.paving;material.roughness=ceiling?.77:.36;}
+  if(kind==='beam')material.map=palette.painted;
+  material.side=THREE.FrontSide;
+  const geometry=object.geometry,positions=geometry.attributes.position,normal=geometry.attributes.normal;
+  const uv=new Float32Array(positions.count*2),centers=INTERIOR.storeys[storey].columns,level=INTERIOR.storeys[storey];
   for(let i=0;i<positions.count;i++){
     const x=positions.getX(i),y=positions.getY(i),z=positions.getZ(i);
-    if(kind==='column' && Math.abs(normal.getY(i))<.1){
+    if(kind==='column'&&Math.abs(normal.getY(i))<.1){
       let nearest=centers[0],distance=Infinity;
       for(const center of centers){const d=(x-center[0])**2+(z-center[1])**2;if(d<distance){nearest=center;distance=d;}}
       const nx=x-nearest[0],nz=z-nearest[1],length=Math.hypot(nx,nz);
-      normal.setXYZ(i,nx/length,0,nz/length);
-      uv[i*2]=Math.atan2(nz,nx)/(Math.PI*2)+.5;uv[i*2+1]=y/2.2;
+      normal.setXYZ(i,nx/length,0,nz/length);uv[i*2]=Math.atan2(nz,nx)/(Math.PI*2)+.5;uv[i*2+1]=y/2.2;
     }else{
       const ax=Math.abs(normal.getX(i)),ay=Math.abs(normal.getY(i)),az=Math.abs(normal.getZ(i));
-      uv[i*2]=(ax>ay&&ax>az?z:x)/2.2;uv[i*2+1]=(ay>=ax&&ay>=az?z:y)/2.2;
+      if(kind==='beam'){
+        uv[i*2]=(ax>az?z:x)/4;uv[i*2+1]=(y-(level.z+level.height-.89))/.60;
+      }else{
+        const tile=ceiling?2.1:3.6;
+        uv[i*2]=(ax>ay&&ax>az?z:x)/tile;uv[i*2+1]=(ay>=ax&&ay>=az?z:y)/tile;
+      }
     }
   }
   geometry.setAttribute('uv',new THREE.BufferAttribute(uv,2));normal.needsUpdate=true;
   return material;
 }
 
-function createFirstFloorGallery({ THREE, scene }) {
+function createFirstFloorGallery({THREE,scene}) {
   let root=null;
   const scale=1.4;
   function build(){
-    root=new THREE.Group();root.name='楼身一层 · 数字主题展陈设计';root.scale.setScalar(scale);
-    root.position.y=INTERIOR.storeys[3].z*scale;scene.add(root);
-    const frameMaterial=new THREE.MeshStandardMaterial({color:'#26352f',roughness:.72});
-    const bronzeMaterial=new THREE.MeshStandardMaterial({color:'#aa8b53',roughness:.56,metalness:.3});
-    const stoneMaterial=new THREE.MeshStandardMaterial({color:'#888b82',roughness:.9});
-    const seatMaterial=new THREE.MeshStandardMaterial({color:'#654936',roughness:.74});
-    const lightMaterial=new THREE.MeshBasicMaterial({color:'#f2d8a7',toneMapped:false});
-    const boxGeometry=new THREE.BoxGeometry(1,1,1);
+    root=new THREE.Group();root.name='首层通高大厅与二层回廊 · 实景参考';
+    const palette=getFirstHallPalette(THREE),hall=INTERIOR.storeys[3],gallery=INTERIOR.storeys[4];
+    const galleryY=gallery.z-hall.z,ceilingY=INTERIOR.storeys[5].z-hall.z-.28;
+    const materials={
+      wood:new THREE.MeshStandardMaterial({color:'#6b282c',roughness:.42}),
+      teal:new THREE.MeshStandardMaterial({color:'#458b88',roughness:.68}),
+      blue:new THREE.MeshStandardMaterial({color:'#315789',roughness:.7}),
+      ivory:new THREE.MeshStandardMaterial({color:'#e4d9b9',roughness:.68}),
+      bronze:new THREE.MeshStandardMaterial({color:'#ad9466',roughness:.52,metalness:.35}),
+      stone:new THREE.MeshStandardMaterial({color:'#858881',roughness:.7}),
+      trim:new THREE.MeshStandardMaterial({color:'#353e3b',roughness:.72}),
+      light:new THREE.MeshBasicMaterial({color:'#ffe9bf',toneMapped:false}),
+      painted:new THREE.MeshStandardMaterial({map:palette.painted,roughness:.74}),
+      coffer:new THREE.MeshStandardMaterial({map:palette.coffer,roughness:.8})
+    };
+    const unitBox=new THREE.BoxGeometry(1,1,1);
     function box(parent,w,h,d,x,y,z,material){
-      const mesh=new THREE.Mesh(boxGeometry,material);mesh.scale.set(w,h,d);mesh.position.set(x,y,z);
-      mesh.receiveShadow=true;parent.add(mesh);return mesh;
+      const mesh=new THREE.Mesh(unitBox,material);mesh.scale.set(w,h,d);mesh.position.set(x,y,z);parent.add(mesh);return mesh;
     }
-    function canvasTexture(width,height,draw){
-      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-      const ctx=canvas.getContext('2d');draw(ctx,width,height);
-      const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;
-      return texture;
+    function face(parent,w,h,x,y,z,texture){
+      const material=new THREE.MeshStandardMaterial({map:texture,roughness:.78,emissive:'#ffffff',emissiveMap:texture,emissiveIntensity:.11});
+      const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),material);mesh.position.set(x,y,z);parent.add(mesh);return mesh;
     }
-    function text(ctx,value,x,y,size,color='#efe8d7',serif=true){
-      ctx.fillStyle=color;ctx.font=`${size}px ${serif?'"Songti SC","Noto Serif SC",serif':'"PingFang SC","Microsoft YaHei",sans-serif'}`;
-      ctx.fillText(value,x,y);
+    function text(ctx,value,x,y,size,color='#ded4ad',align='left'){
+      ctx.textAlign=align;ctx.fillStyle=color;ctx.font=size+'px "Songti SC","STSong","Noto Serif SC",serif';ctx.fillText(value,x,y);
     }
-    function wrap(ctx,value,x,y,width,size,color='#d9d7c9',leading=1.75){
-      ctx.font=`${size}px "PingFang SC","Microsoft YaHei",sans-serif`;ctx.fillStyle=color;
-      let line='';
-      for(const char of value){if(ctx.measureText(line+char).width>width){ctx.fillText(line,x,y);line=char;y+=size*leading;}else line+=char;}
-      if(line)ctx.fillText(line,x,y);return y+size*leading;
-    }
-    function rule(ctx,x,y,w,color='#a38a59'){
-      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w,y);ctx.stroke();
-    }
-    const welcome=canvasTexture(1536,1120,(ctx,w,h)=>{
-      ctx.fillStyle='#203a35';ctx.fillRect(0,0,w,h);
-      const wash=ctx.createLinearGradient(0,0,w,h);wash.addColorStop(0,'#2d4940');wash.addColorStop(1,'#172b29');ctx.fillStyle=wash;ctx.fillRect(0,0,w,h);
-      text(ctx,'鹳雀楼  /  楼身一层',96,106,32,'#cbb783',false);rule(ctx,96,145,w-192);
-      text(ctx,FLOOR_STORIES[3].title,96,320,112);
-      text(ctx,FLOOR_STORIES[3].lead,102,405,34,'#c4cebe',false);
-      // Abstract river and mountain lines illustrate the theme, not a historic skyline.
+    function titleTexture(title,subtitle){return hallCanvasTexture(THREE,1024,160,(ctx,w,h)=>{
+      ctx.fillStyle='#3b4f50';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#c9af78';ctx.lineWidth=6;ctx.strokeRect(9,9,w-18,h-18);
+      text(ctx,title,w/2,80,57,'#ead8a1','center');text(ctx,subtitle,w/2,128,24,'#c0c9b8','center');
+    });}
+    function muralTexture(item){return hallCanvasTexture(THREE,item.type==='panorama'?2048:1024,768,(ctx,w,h)=>{
+      const panorama=item.type==='panorama';
+      const wash=ctx.createLinearGradient(0,0,0,h);wash.addColorStop(0,panorama?'#9cbaaa':'#d0b47a');wash.addColorStop(1,panorama?'#807952':'#947448');ctx.fillStyle=wash;ctx.fillRect(0,0,w,h);
       for(let layer=0;layer<4;layer++){
-        ctx.beginPath();ctx.moveTo(0,625+layer*44);
-        for(let x=0;x<=w;x+=16)ctx.lineTo(x,610+layer*42+Math.sin(x/210+layer)*36+Math.sin(x/93+layer)*11);
-        ctx.lineTo(w,820);ctx.lineTo(0,820);ctx.fillStyle=['#344c40','#486150','#6d7b5d','#a1956c'][layer];ctx.fill();
+        ctx.beginPath();ctx.moveTo(0,h);
+        for(let x=0;x<=w;x+=14)ctx.lineTo(x,h*.18+layer*32+Math.sin(x/137+layer)*42+Math.sin(x/57+layer)*14);
+        ctx.lineTo(w,h);ctx.fillStyle=panorama?['#6d9386','#799a86','#829277','#979578'][layer]:['#ac9b69','#b4a074','#a99461','#b69d68'][layer];ctx.fill();
       }
-      ctx.strokeStyle='#dbbc80';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,790);ctx.bezierCurveTo(270,662,460,881,800,745);ctx.bezierCurveTo(1080,657,1220,786,1536,695);ctx.stroke();
-      const dates=[['北周','古楼肇始'],['1997','复建启动'],['2002','对外开放']];
-      dates.forEach(([date,label],i)=>{const x=98+i*480;text(ctx,date,x,939,56,'#e0c68f');text(ctx,label,x,994,28,'#bfc9b7',false);});
-      text(ctx,'数字主题导览 · 据景区介绍编排',98,1071,24,'#afbaa8',false);
-    });
-    const origin=canvasTexture(768,1152,(ctx,w,h)=>{
-      ctx.fillStyle='#dfd8c4';ctx.fillRect(0,0,w,h);
-      text(ctx,'01  /  古楼的来处',66,105,28,'#354536',false);rule(ctx,66,144,w-132,'#9e947a');
-      text(ctx,'因鹳雀而名',66,271,67,'#172d24');
-      wrap(ctx,'据景区介绍，古楼始建于北周，最初具有军事戍楼的用途。鹳雀常来栖息，楼因而得名。',68,385,628,34,'#25352c',1.85);
-      rule(ctx,68,747,632,'#b4ac92');
-      text(ctx,'楼临黄河，远望中条',68,840,37,'#293e2f');
-      wrap(ctx,'古楼的记忆，在今天的复建楼里继续被讲述。',68,932,628,29,'#354536',1.7);
-      text(ctx,'数字展陈示意  ·  景区介绍',68,1088,23,'#485844',false);
-    });
-    const poem=canvasTexture(768,1152,(ctx,w,h)=>{
-      ctx.fillStyle='#263a34';ctx.fillRect(0,0,w,h);
-      text(ctx,'02  /  二十字的远望',66,105,28,'#c4b084',false);rule(ctx,66,144,w-132);
-      text(ctx,'登鹳雀楼',66,263,70);text(ctx,'唐 · 王之涣',70,333,29,'#b8c0ad',false);
-      ['白日依山尽','黄河入海流','欲穷千里目','更上一层楼'].forEach((line,i)=>text(ctx,line,106,488+i*113,64,i<2?'#e4dfcc':'#d7bd83'));
-      rule(ctx,68,940,632);text(ctx,'沿着楼层，继续这次登临。',68,1026,30,'#b8c0ad',false);
-      text(ctx,'数字展陈示意',68,1090,23,'#aab8a4',false);
-    });
-    const textures={welcome,origin,poem};
-    for(const item of FIRST_FLOOR_EXHIBITS){
+      function house(x,y,size,tower=false){
+        const bh=size*(tower?1.12:.43),bw=size;
+        ctx.fillStyle=panorama?'#bfad83':'#b99f69';ctx.fillRect(x-bw/2,y-bh,bw,bh);
+        ctx.fillStyle=panorama?'#e2cf9b':'#dcc38b';ctx.fillRect(x-bw/2,y-bh,6,bh);
+        ctx.fillStyle=panorama?'#69634d':'#78653f';
+        for(let k=0;k<3;k++)ctx.fillRect(x-bw*.32+k*bw*.27,y-bh*.68,bw*.13,bh*.68);
+        ctx.beginPath();ctx.moveTo(x-bw*.68,y-bh+8);ctx.lineTo(x-bw*.34,y-bh-size*.30);ctx.lineTo(x+bw*.34,y-bh-size*.30);ctx.lineTo(x+bw*.68,y-bh+8);ctx.closePath();ctx.fill();
+        ctx.strokeStyle=panorama?'#c5bc8d':'#e0c18b';ctx.lineWidth=3;ctx.stroke();
+        if(tower){ctx.fillStyle='#b69967';ctx.fillRect(x-bw*.35,y-bh-size*.33,bw*.7,size*.21);}
+      }
+      if(panorama){
+        ctx.fillStyle='#b8b594';ctx.beginPath();ctx.moveTo(0,h*.73);ctx.bezierCurveTo(w*.34,h*.55,w*.42,h*.9,w,h*.64);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+        for(let row=0;row<5;row++)for(let col=0;col<22;col++)house(35+col*(w/22)+Math.sin(row*7+col)*14,295+row*66+Math.cos(col*1.4)*17,29+row*7,(row+col)%9===0);
+        ctx.strokeStyle='#665d42';ctx.lineWidth=20;ctx.beginPath();ctx.moveTo(w*.05,h*.69);ctx.lineTo(w*.19,h*.51);ctx.lineTo(w*.70,h*.57);ctx.lineTo(w*.91,h*.80);ctx.stroke();
+        for(const [x,y] of [[.19,.51],[.49,.55],[.70,.57],[.89,.77]])house(w*x,h*y,86,true);
+        ctx.strokeStyle='#e7d6a5';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(w*.09,h*.88);ctx.bezierCurveTo(w*.38,h*.61,w*.61,h*.88,w*.97,h*.75);ctx.stroke();
+      }else if(item.id==='defence'){
+        for(let k=0;k<8;k++)house(60+k*132,438+(k%2)*29,106,k%3===0);
+        ctx.fillStyle='#a98c55';ctx.fillRect(0,463,w,105);ctx.strokeStyle='#d9be84';ctx.lineWidth=3;
+        for(let y=466;y<568;y+=23){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+        for(let k=0;k<9;k++){ctx.fillStyle='#79633e';ctx.beginPath();ctx.arc(120+k*96,601,13,0,Math.PI*2);ctx.fill();ctx.fillRect(110+k*96,618,20,69);ctx.fillRect(133+k*96,568,4,116);}
+      }else{
+        house(w*.70,430,275,true);
+        for(let k=0;k<4;k++){
+          const x=160+k*183,y=430+Math.sin(k)*57;
+          ctx.fillStyle='#796445';ctx.beginPath();ctx.arc(x,y,26,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.moveTo(x-28,y+27);ctx.lineTo(x-67,y+184);ctx.lineTo(x+75,y+184);ctx.lineTo(x+31,y+28);ctx.fill();
+          ctx.strokeStyle='#dec18a';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(x-15,y+40);ctx.lineTo(x+8,y+125);ctx.lineTo(x-19,y+173);ctx.stroke();
+        }
+      }
+      ctx.fillStyle='rgba(42,43,32,.64)';ctx.fillRect(0,h-47,w,47);
+      text(ctx,item.title,w/2,h-16,25,'#eee2bf','center');text(ctx,'图像示意',w-20,35,20,'#364a3c','right');
+    });}
+    function exhibit(item){
       const group=new THREE.Group();group.position.set(item.x,0,item.z);group.rotation.y=item.yaw;root.add(group);
       if(item.bench){
-        box(group,item.w,.12,item.d,0,.40,0,seatMaterial);
-        for(const x of [-item.w*.34,item.w*.34])box(group,.22,.34,item.d*.76,x,.17,0,stoneMaterial);
-        continue;
+        box(group,item.w,.12,item.d,0,.40,0,materials.wood);
+        for(const x of [-item.w*.34,item.w*.34])box(group,.22,.34,item.d*.76,x,.17,0,materials.stone);
+        return;
       }
-      box(group,item.w+.12,.18,item.foot,0,.09,0,stoneMaterial);
-      box(group,item.w,item.h,item.d,0,.22+item.h/2,0,frameMaterial);
-      for(const x of [-item.w/2+.025,item.w/2-.025])box(group,.034,item.h-.06,.016,x,.22+item.h/2,item.d/2+.016,bronzeMaterial);
-      const texture=textures[item.id];
-      const face=new THREE.Mesh(new THREE.PlaneGeometry(item.w-.11,item.h-.10),new THREE.MeshStandardMaterial({map:texture,roughness:.94,emissive:'#ffffff',emissiveMap:texture,emissiveIntensity:.2}));
-      face.position.set(0,.22+item.h/2,item.d/2+.018);group.add(face);
-      box(group,item.w-.1,.025,.04,0,.22+item.h+.015,.03,lightMaterial);
+      const base=item.base||0;
+      if(item.type==='guide'){
+        box(group,.65,.07,item.foot,0,.035,0,materials.stone);box(group,.12,.84,.12,0,.49,0,materials.bronze);
+        const texture=hallCanvasTexture(THREE,768,672,(ctx,w,h)=>{
+          ctx.fillStyle='#233f39';ctx.fillRect(0,0,w,h);text(ctx,item.title,56,111,60);
+          const lines=item.id==='hall-guide'?['抬头看彩绘梁枋','沿壁画走进古蒲州','上到回廊，俯瞰大厅']:['白日依山尽','黄河入海流','欲穷千里目','更上一层楼'];
+          lines.forEach((line,k)=>text(ctx,line,56,243+k*86,39,'#e8e2cd'));text(ctx,'数字导览',56,626,25,'#aabca4');
+        });
+        box(group,item.w,.72,item.d,0,.87,0,materials.wood);face(group,item.w-.07,.66,0,.87,item.d/2+.012,texture);return;
+      }
+      box(group,item.w+.12,base+.06,item.foot,0,(base+.06)/2,0,materials.wood);
+      box(group,item.w+.12,item.h+.12,item.d,0,base+item.h/2,0,materials.wood);
+      for(const x of [-item.w/2,item.w/2])box(group,.045,item.h,.018,x,base+item.h/2,item.d/2+.01,materials.bronze);
+      for(const y of [base,base+item.h])box(group,item.w,.045,.018,0,y,item.d/2+.01,materials.bronze);
+      let texture;
+      if(item.type==='couplet')texture=hallCanvasTexture(THREE,768,1200,(ctx,w,h)=>{
+        ctx.fillStyle='#dfdbc9';ctx.fillRect(0,0,w,h);text(ctx,'一楼楹联',w/2,100,54,'#564c36','center');
+        const lines=['襟星月而披風雨控秦晉而淩覆載華夏立雄威','借詩文以傲古今銘盛衰以鑒春秋山川生壯慨'];
+        lines.forEach((line,k)=>[...line].forEach((char,n)=>text(ctx,char,k?230:510,192+n*41,37,'#3c3c32','center')));
+        text(ctx,'据实景楹联节录',w/2,h-35,24,'#6a694e','center');
+      });else texture=muralTexture(item);
+      face(group,item.w-.07,item.h-.08,0,base+item.h/2,item.d/2+.019,texture);
+      if(item.type==='panorama'){
+        const roof=box(group,item.w+.36,.10,.85,0,base+item.h+.24,0,materials.trim);roof.rotation.x=.30;
+        for(let x=-item.w/2;x<=item.w/2;x+=.18){const rib=box(group,.035,.036,.86,x,base+item.h+.30,0,materials.stone);rib.rotation.x=.30;}
+        face(group,2.4,.38,0,base+item.h+.52,.04,titleTexture(item.title,'首层展项 · 实景参考'));
+      }else if(item.type==='relief')face(group,2.5,.42,0,base+item.h+.38,.03,titleTexture(item.title,'首层展项 · 图像示意'));
+      box(group,item.w*.82,.045,.08,0,base+item.h+.09,.27,materials.light);
     }
-    // Warm, fixed lights make the first hall feel like a place rather than a headlamp.
-    for(const x of [-3.5,3.5]){
-      box(root,.075,.055,9.4,x,6.22,0,frameMaterial);
-      box(root,.045,.014,9.2,x,6.181,0,lightMaterial);
-      const light=new THREE.PointLight('#ffe7c1',30,16,2);light.position.set(x,4.7,.8);root.add(light);
+    FIRST_FLOOR_EXHIBITS.forEach(exhibit);
+
+    // Approximate stepped bracket profiles and painted collars frame the hall.
+    const profile=new THREE.Shape();profile.moveTo(-1.0,.22);profile.lineTo(1.0,.22);
+    profile.lineTo(1.0,.02);profile.quadraticCurveTo(.77,-.02,.64,-.29);
+    profile.lineTo(.29,-.40);profile.lineTo(-.29,-.40);profile.lineTo(-.64,-.29);
+    profile.quadraticCurveTo(-.77,-.02,-1.0,.02);profile.closePath();
+    const armGeometry=new THREE.ExtrudeGeometry(profile,{depth:.22,bevelEnabled:false,curveSegments:6});
+    for(const index of [3,4]){
+      const level=INTERIOR.storeys[index],offset=level.z-hall.z,diameter=index===3?1.2:1.1;
+      for(const [x,z] of level.columns){
+        if(Math.abs(x)>8.05)continue;
+        const baseMesh=new THREE.Mesh(new THREE.CylinderGeometry(diameter*.58,diameter*.63,.16,24),materials.stone);baseMesh.position.set(x,offset+.08,z);root.add(baseMesh);
+        const capital=offset+level.height-1.13;
+        for(const [delta,color] of [[-.48,materials.ivory],[-.38,materials.blue],[-.26,materials.teal]]){
+          const collar=new THREE.Mesh(new THREE.CylinderGeometry(diameter*.507,diameter*.507,.085,24),color);collar.position.set(x,capital+delta,z);root.add(collar);
+        }
+        for(let direction=0;direction<2;direction++)for(let step=0;step<3;step++){
+          const group=new THREE.Group();group.position.set(x,capital+step*.17,z);group.rotation.y=direction*Math.PI/2;root.add(group);
+          const arm=new THREE.Mesh(armGeometry,[materials.ivory,materials.blue,materials.teal][step]);arm.scale.set(1-step*.13,.74,1);arm.position.z=-.11;group.add(arm);
+        }
+        box(root,1.40,.18,1.40,x,capital+.43,z,materials.wood);
+      }
     }
+    // Recessed panels sit below the ceiling, never on a walkable floor.
+    for(let x=-3.75;x<=3.75;x+=2.5)for(let z=-4.725;z<=4.726;z+=3.15){
+      const panel=new THREE.Mesh(new THREE.PlaneGeometry(2.30,2.95),materials.coffer);panel.rotation.x=Math.PI/2;panel.position.set(x,ceilingY-.07,z);root.add(panel);
+    }
+    // Gallery soffits have painted coffers too; leave the central void clear.
+    for(const x of [-6.4,-3.75,-1.25,1.25,3.75,6.4])for(const z of [-8.45,-4.725,-1.575,1.575,4.725,8.45]){
+      if(Math.abs(x)<5&&Math.abs(z)<6.3)continue;
+      const panel=new THREE.Mesh(new THREE.PlaneGeometry(2.30,2.95),materials.coffer);panel.rotation.x=Math.PI/2;panel.position.set(x,galleryY-.35,z);root.add(panel);
+    }
+    for(const x of [-5,-2.5,0,2.5,5])box(root,.12,.24,12.65,x,ceilingY-.15,0,materials.teal);
+    for(const z of [-6.3,-3.15,0,3.15,6.3])box(root,10.05,.24,.12,0,ceilingY-.15,z,materials.teal);
+    for(const [x,z,w,yaw] of [[0,6.45,10.0,Math.PI],[0,-6.45,10.0,0],[-5.16,0,12.55,Math.PI/2],[5.16,0,12.55,-Math.PI/2]]){
+      const fascia=new THREE.Mesh(new THREE.PlaneGeometry(w,.50),materials.painted);fascia.position.set(x,galleryY-.59,z);fascia.rotation.y=yaw;root.add(fascia);
+    }
+    for(const [x,y,z,power] of [[-3.6,5.3,1,55],[3.6,5.3,-2,55],[0,11.7,0,65]]){
+      const light=new THREE.PointLight('#ffefd3',power,27,2);light.position.set(x,y,z);root.add(light);
+    }
+    // Merge static pieces by material to keep the detailed hall inexpensive.
+    root.updateMatrixWorld(true);
+    const batches=new Map(),meshes=[],geometries=new Set();
+    root.traverse(mesh=>{
+      if(!mesh.isMesh)return;
+      meshes.push(mesh);geometries.add(mesh.geometry);
+      const geometry=(mesh.geometry.index?mesh.geometry.toNonIndexed():mesh.geometry.clone()).applyMatrix4(mesh.matrixWorld);
+      if(!batches.has(mesh.material))batches.set(mesh.material,[]);batches.get(mesh.material).push(geometry);
+    });
+    for(const mesh of meshes)mesh.removeFromParent();
+    for(const [material,parts] of batches){
+      const geometry=new THREE.BufferGeometry();
+      for(const [name,size] of [['position',3],['normal',3],['uv',2]]){
+        const count=parts.reduce((total,part)=>total+part.attributes[name].array.length,0),data=new Float32Array(count);let cursor=0;
+        for(const part of parts){data.set(part.attributes[name].array,cursor);cursor+=part.attributes[name].array.length;}
+        geometry.setAttribute(name,new THREE.BufferAttribute(data,size));
+      }
+      geometry.computeBoundingSphere();const mesh=new THREE.Mesh(geometry,material);mesh.receiveShadow=true;root.add(mesh);
+      parts.forEach(part=>part.dispose());
+    }
+    geometries.forEach(geometry=>geometry.dispose());
+    root.scale.setScalar(scale);root.position.y=hall.z*scale;scene.add(root);
   }
   return {
-    setFloor(index){if(index===3&&!root)build();if(root)root.visible=index===3;},
+    setFloor(index){const visible=index===3||index===4;if(visible&&!root)build();if(root)root.visible=visible;},
     hide(){if(root)root.visible=false;}
   };
 }
@@ -724,15 +866,10 @@ function interiorWalkCanStand(level, x, z) {
   if (Math.abs(x) > level.width / 2 - .42 || z > frontLimit || z < -level.depth / 2 + .42) return false;
   const nearBox = (cx, cz, hx, hz) => Math.hypot(Math.max(0, Math.abs(x - cx) - hx), Math.max(0, Math.abs(z - cz) - hz)) < radius;
   const diameter = level.index <= 3 ? 1.2 : ({4:1.1,5:1,6:.9,7:.9,8:.9}[level.index]);
-  const columns = [];
-  for (const cx of [-12,-8,8,12]) for (const cz of [-7,0,7]) columns.push([cx,cz]);
-  for (const cx of [-4,0,4]) for (const cz of [-7,7]) columns.push([cx,cz]);
-  columns.push([0,-2.6],[0,2.6]);
-  if (level.index < 3) {
-    for (const cx of [-24,24]) for (const cz of [-16,0,16]) columns.push([cx,cz]);
-    columns.push([0,-16],[0,16]);
-  }
-  if (columns.some(([cx,cz]) => level.index < 3 ? nearBox(cx,cz,.55,.55) : Math.hypot(x-cx,z-cz) < diameter/2+radius)) return false;
+  // Exported metadata is also the source for column and gallery collision.
+  const columnRadius=diameter*([3,4].includes(level.index)?.63:.5);
+  if (level.columns.some(([cx,cz]) => level.index < 3 ? nearBox(cx,cz,.55,.55) : Math.hypot(x-cx,z-cz) < columnRadius+radius)) return false;
+  if (level.voids.some(v=>nearBox(v.x,v.z,v.width/2+v.guard,v.depth/2+v.guard))) return false;
   for (const cx of [-10,10]) {
     // Keep free walking on the floor. The stair controls take over at the cores.
     if (nearBox(cx,2.95,1.74,3.87) || nearBox(cx,-4.92,1.74,1.9)) return false;
@@ -742,6 +879,23 @@ function interiorWalkCanStand(level, x, z) {
   }
   if (level.index===3 && !firstFloorExhibitsCanStand(x,z,radius)) return false;
   return true;
+}
+
+function interiorWalkSpawn(level) {
+  // Start just inside the first column bay so the hall fills the opening view.
+  // The upper entry remains on the gallery, behind its protected inner edge.
+  if(level.index===3)return [1.3,level.z+1.65,4.6];
+  if(level.index===4)return [2,level.z+1.65,7.2];
+  return [2,level.z+1.65,Math.min(10.6,level.depth/2-.65)];
+}
+
+// Define the lens against the unobscured scene, not the whole canvas hidden
+// behind navigation. This preserves a useful field of view on narrow screens.
+function interiorWalkFraming(width,height,rect,wide=true) {
+  const viewWidth=Math.max(120,rect.right-rect.left),viewHeight=Math.max(120,rect.bottom-rect.top);
+  const horizontal=(wide?92:76)*Math.PI/180;
+  const fov=Math.min(wide?106:94,Math.max(46,2*Math.atan(Math.tan(horizontal/2)*viewHeight/viewWidth)*180/Math.PI));
+  return {fov,fullWidth:viewWidth,fullHeight:viewHeight,x:-rect.left,y:-rect.top,width,height};
 }
 
 function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onExit, onFloor, setMode }) {
@@ -754,6 +908,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   let active = false, floor = 3, lastStory = -1;
   let yaw = 0, pitch = -.04, dragging = null, transition = null, saved = null;
   let walkingLastFrame = false;
+  let wideView=readPreference('guanque-interior-view-v1',{wide:true}).wide!==false;
   const direction = new THREE.Vector3(), nextPosition = new THREE.Vector3();
   const savedVisits = readPreference('guanque-floor-stories-v1', { floors: [] }).floors;
   const visited = new Set(Array.isArray(savedVisits) ? savedVisits.filter(id => storyLevels.some(story => story.id === id)) : []);
@@ -797,7 +952,22 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-storey').appendChild(option);
   }
   function point(value) { return new THREE.Vector3(...value).multiplyScalar(scale); }
-  function spawn(index) { return point([2,levels[index].z+eye,Math.min(8,levels[index].depth/2-.65)]); }
+  function spawn(index) { return point(interiorWalkSpawn(levels[index])); }
+  function faceEntrance(index) { yaw=index===3?-.18:index===4?-.20:0;pitch=index===3?.14:index===4?-.36:-.04;orient(); }
+  function layout() {
+    const width=window.innerWidth,height=window.innerHeight,phone=width<=720;
+    const sidebar=document.querySelector('.sidebar').getBoundingClientRect();
+    const toolbar=document.querySelector('.top-controls').getBoundingClientRect();
+    const tools=document.querySelector('.scene-tools').getBoundingClientRect();
+    const rect={left:phone?10:sidebar.right+16,right:width-10,top:toolbar.bottom+12,
+      bottom:phone?Math.min(sidebar.top,tools.top)-10:height-76};
+    const view=interiorWalkFraming(width,height,rect,wideView);
+    camera.fov=view.fov;
+    camera.setViewOffset(view.fullWidth,view.fullHeight,view.x,view.y,view.width,view.height);
+    camera.updateProjectionMatrix();
+    $('walk-fov').setAttribute('aria-pressed',String(wideView));
+    $('walk-fov').textContent=wideView?'开阔视野':'自然视野';
+  }
   function orient() {
     direction.set(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),-Math.cos(yaw)*Math.cos(pitch));
     camera.lookAt(nextPosition.copy(camera.position).add(direction));
@@ -815,9 +985,10 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-recenter').disabled=!!transition;
     board.material.map=storyTextures[floor];
     board.position.set(3.4*scale,(level.z+1.95)*scale,0);
-    board.visible=floor!==3;
+    board.visible=floor!==3&&floor!==4;
     gallery.setFloor(floor);
-    light.intensity=floor===3?3:25;
+    light.intensity=floor===3||floor===4?3:25;
+    $('walk-reference').hidden=floor!==3&&floor!==4;
     for (const {cx,portal} of portals) portal.position.set(cx*scale,level.z*scale,interiorStairFoyer(level)*scale);
     onFloor(floor);
   }
@@ -835,7 +1006,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     $('walk-story-body').replaceChildren(...story.paragraphs.map(text=>{const p=document.createElement('p');p.textContent=text;return p;}));
     $('walk-story-source').href=story.source;
     $('walk-story-source').textContent=isStoryFloor(floor)?'查阅故事依据 ↗':'查阅结构依据 ↗';
-    $('walk-story-scope').textContent=floor===3?'首层为数字主题展陈设计，陈设与空间均为示意。六层故事按公开资料编排。':isStoryFloor(floor)?'六层故事为数字导览主题编排，不代表真实展厅用途。':'台基三层展示结构关系；平面与部分标高仍待完整 CAD 核对。';
+    $('walk-story-scope').textContent=floor===3||floor===4?'大厅与回廊参考实拍；尺寸、彩绘细节和壁画图像为示意。六层故事为数字导览编排。':isStoryFloor(floor)?'六层故事为数字导览主题编排，不代表真实展厅用途。':'台基三层展示结构关系；平面与部分标高仍待完整 CAD 核对。';
     $('walk-read-story').hidden=!story.audio;
     $('walk-story').hidden=false;
     document.querySelector('.walk-story-reading').scrollTop=0;
@@ -861,7 +1032,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
     if (!active || transition) return;
     clearInput(); closeStory(); markers.visible=false;
     if(visitorExperience.reducedMotion){
-      camera.position.copy(spawn(to));yaw=0;pitch=-.04;orient();arrive();return;
+      camera.position.copy(spawn(to));faceEntrance(to);arrive();return;
     }
     transition={kind:'fade',age:0,moved:false,to,route};
     $('walk-status').textContent=route?'前往楼梯，随后沿梯段登临…':'正在进入'+levels[to].label+'…';
@@ -919,6 +1090,7 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
   $('walk-down').addEventListener('click',()=>changeFloor(-1));
   $('walk-storey').addEventListener('change',event=>warp(Number(event.target.value)));
   $('walk-recenter').addEventListener('click',()=>{lastStory=-1;warp(floor);});
+  $('walk-fov').addEventListener('click',()=>{wideView=!wideView;clearInput();savePreference('guanque-interior-view-v1',{wide:wideView});layout();});
   $('walk-story-again').addEventListener('click',showStory);
   $('walk-close-story').addEventListener('click',()=>closeStory(true));
   $('walk-continue').addEventListener('click',()=>closeStory(true));
@@ -931,7 +1103,9 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
       if(active)return;
       saved={position:camera.position.clone(),target:controls.target.clone(),fov:camera.fov};
       active=true;floor=index;lastStory=-1;controls.enabled=false;
-      camera.fov=68;camera.updateProjectionMatrix();decor.visible=true;document.body.classList.add('walking');
+      decor.visible=true;document.body.classList.add('walking');
+      if(window.innerWidth<=720)visitorExperience.collapsePanel();
+      layout();
       warp(index);
     },
     exit(){
@@ -940,22 +1114,19 @@ function createInteriorWalk({ THREE, scene, camera, controls, canvas, sound, onE
       $('walk-fade').style.opacity='0';document.body.classList.remove('walking');
       camera.fov=saved.fov;camera.position.copy(saved.position);controls.target.copy(saved.target);
       camera.updateProjectionMatrix();camera.lookAt(controls.target);controls.enabled=true;
+      visitorExperience.expandPanel();
     },
-    layout(){
-      const width=window.innerWidth,height=window.innerHeight,sidebar=document.querySelector('.sidebar').getBoundingClientRect();
-      camera.setViewOffset(width,height,width>720?-sidebar.right/2:0,width>720?0:Math.max(0,(height-sidebar.top)/2),width,height);
-      camera.updateProjectionMatrix();
-    },
+    layout,
     tick(seconds){
       if(!active)return;
       if(visitorExperience.covered||document.querySelector('dialog[open]')){clearInput();return;}
       if(transition&&visitorExperience.reducedMotion){
-        camera.position.copy(spawn(transition.to));yaw=0;pitch=-.04;orient();arrive();
+        camera.position.copy(spawn(transition.to));faceEntrance(transition.to);arrive();
       }
       if(transition?.kind==='fade'){
         const item=transition;item.age+=seconds;
         $('walk-fade').style.opacity=String(Math.sin(Math.min(1,item.age/.7)*Math.PI));
-        if(item.age>=.35&&!item.moved){item.moved=true;camera.position.copy(item.route?item.route[0]:spawn(item.to));yaw=0;pitch=-.04;orient();}
+        if(item.age>=.35&&!item.moved){item.moved=true;camera.position.copy(item.route?item.route[0]:spawn(item.to));faceEntrance(item.route?floor:item.to);}
         if(item.age>=.7){
           if(item.route){
             const lengths=[0];for(let i=1;i<item.route.length;i++)lengths.push(lengths[i-1]+item.route[i].distanceTo(item.route[i-1]));
@@ -1031,7 +1202,7 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
     $('interior-legend-floor').textContent = item ? `${item.label} · ${item.known ? '有标高依据' : '标高推定'}` : '九层结构示意';
   }
   function applyWalkMaterials() {
-    const inFirstHall=walker.active && walker.floor===3;
+    const inFirstHall=walker.active && (walker.floor===3||walker.floor===4);
     for(const item of materialList) item.object.material=inFirstHall&&item.showcaseMaterial ? item.showcaseMaterial : item.material;
   }
   function exteriorMaterials(callback) {
@@ -1256,7 +1427,8 @@ function createInteriorExplorer({ THREE, GLTFLoader, scene, renderer, camera, co
     eyebrow: '内部结构 · 资料与推定', title: '这版内部做到哪里', lead: INTERIOR.scope,
     paragraphs: [
       '施工正文确认了九层划分、部分标高、20 根内柱及其与两处剪力墙的关系；交通区位于 4–5、8–9 轴和 E–G 轴之间。',
-      '目前没有完整建筑平面 CAD。楼板轮廓、轴线间距、交通区的绝对位置、墙厚、梯段及井道尺寸均为示意。未把缺失的房间用途和运营路线加入模型。',
+      '首层通高大厅、二层回廊参考实拍，施工文字也提及二层回廊和一层洞口。洞口长宽与柱位是结合现有楼体的推定，未取得完整建筑平面 CAD。',
+      '楼板轮廓、轴线间距、交通区绝对位置、墙厚、梯段及井道尺寸仍为示意。首层展项主题有照片依据，壁画图像为简化绘制。',
       '台基二、三层和楼身二、三层采用分段等分的推定标高；楼身六层沿用照片模型高度。它们用赭黄色楼板表示。'
     ], source: INTERIOR.sources[0]
   }));
