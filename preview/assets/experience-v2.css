@@ -256,3 +256,18 @@
   .sidebar-compact.walking [data-walk-move=right]{order:3}
   .sidebar-compact.walking .walk-floor-actions button{min-height:44px}
 }
+
+/* In a short landscape viewport, reserve the reader's height for the story. */
+@media(max-height:520px){
+  .walk-story.is-exhibit{top:72px;right:12px;left:auto;width:min(390px,calc(100vw - 24px));max-height:calc(100dvh - 84px)}
+  .walk-story.is-exhibit .walk-story-reading{padding:15px 18px}
+  .walk-story.is-exhibit #walk-story-floor{font-size:9px;margin:0 23px 5px 0}
+  .walk-story.is-exhibit h2{font-size:21px;margin:0 0 7px}
+  .walk-story.is-exhibit .detail-lead{font-size:12px;line-height:1.7;padding-bottom:8px;margin:0 0 10px}
+  .walk-story.is-exhibit .walk-exhibit-figure{display:none}
+  .walk-story.is-exhibit #walk-story-body p{font-size:13px;line-height:1.8;margin-bottom:12px}
+  .walk-story.is-exhibit .walk-story-actions{display:flex;align-items:center;gap:8px;padding:8px}
+  .walk-story.is-exhibit .walk-exhibit-pagination{flex:0 0 150px;gap:3px;margin:0}
+  .walk-story.is-exhibit .walk-exhibit-pagination button{min-height:44px;font-size:11px;padding:7px}
+  .walk-story.is-exhibit .walk-story-actions>.primary-button{flex:1;min-width:0;font-size:12px;padding:8px}
+}
